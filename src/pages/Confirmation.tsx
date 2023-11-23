@@ -1,4 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
+import { db } from "../config/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { useState, useEffect } from "react";
 
 interface Props {
   deliveryType: string;
@@ -9,6 +12,38 @@ interface Props {
 const Confirmation = () => {
   const location = useLocation();
   const fromHome: Props = location.state.fromHome;
+
+  const [fullName, setFullName] = useState<string>("");
+  const [telephone, setTelephone] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
+  const [deliveryType, setDeliveryType] = useState<string>("");
+  const [shareCost, setShareCost] = useState<string>("");
+  const [shareQuantity, setShareQuantity] = useState<number>(0);
+
+  useEffect(() => {
+    if ((Object.values(fromHome).every(p => p !== null && p !== undefined))) {
+      setDeliveryType(fromHome.deliveryType);
+      setShareCost(fromHome.shareCost);
+      setShareQuantity(fromHome.shareQuantity);
+    }
+  });
+
+  const shareOwnersRef = collection(db, "shareOwners");
+
+  const onSubmit = async () => {
+    try {
+      await addDoc(shareOwnersRef, {
+        fullName: fullName,
+        telephone: telephone,
+        address: address,
+        deliveryType: deliveryType,
+        shareCost: shareCost,
+        shareQuantity: shareQuantity,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -38,7 +73,7 @@ const Confirmation = () => {
                     className="kesimhane-teslim teslimat-yazi"
                     id="deliveryType"
                   >
-                    {fromHome.deliveryType}
+                    {deliveryType}
                   </p>
                 </div>
                 <div className="d-flex">
@@ -48,7 +83,7 @@ const Confirmation = () => {
                     style={{ width: "15%" }}
                     id="sharePrice"
                   >
-                    {fromHome.shareCost} TL
+                    {shareCost} TL
                   </p>
                   <p
                     className="teslimat-yazi"
@@ -61,7 +96,7 @@ const Confirmation = () => {
                     style={{ width: "6%" }}
                     id="shareAmount"
                   >
-                    {fromHome.shareQuantity}
+                    {shareQuantity}
                   </p>
                 </div>
                 <div className="d-flex">
@@ -93,6 +128,7 @@ const Confirmation = () => {
                       className="form-control inputlar"
                       id="personName"
                       placeholder="Ad Soyad Giriniz"
+                      onChange={(e) => setFullName(e.target.value)}
                     />
                   </div>
                 </div>
@@ -107,6 +143,7 @@ const Confirmation = () => {
                       id="tel"
                       maxLength={11}
                       placeholder="555 555 55 55"
+                      onChange={(e) => setTelephone(e.target.value)}
                     />
                   </div>
                 </div>
@@ -121,6 +158,7 @@ const Confirmation = () => {
                     className="form-control inputlar"
                     id="address"
                     placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, eros vel bibendum lacinia, justo nunc tempor sapien, at viverra sapien ex ut nisi."
+                    onChange={(e) => setAddress(e.target.value)}
                   />
                 </div>
                 <div className="form-check">
@@ -162,6 +200,7 @@ const Confirmation = () => {
           className="btn btn-success"
           style={{ marginBottom: "182px" }}
           id="nextButton"
+          onClick={onSubmit}
         >
           Kaydımı Kesinleştir!
         </button>
