@@ -21,7 +21,7 @@ const Confirmation = () => {
   const [shareQuantity, setShareQuantity] = useState<number>(0);
 
   useEffect(() => {
-    if ((Object.values(fromHome).every(p => p !== null && p !== undefined))) {
+    if (Object.values(fromHome).every((p) => p !== null && p !== undefined)) {
       setDeliveryType(fromHome.deliveryType);
       setShareCost(fromHome.shareCost);
       setShareQuantity(fromHome.shareQuantity);
@@ -195,15 +195,17 @@ const Confirmation = () => {
       </div>
 
       <div className="button d-flex justify-content-center">
-        <button
-          type="button"
-          className="btn btn-success"
-          style={{ marginBottom: "182px" }}
-          id="nextButton"
-          onClick={onSubmit}
-        >
-          Kaydımı Kesinleştir!
-        </button>
+        <Link style={{ textDecoration: "none" }} to="/finalization">
+          <button
+            type="button"
+            className="btn btn-success"
+            style={{ marginBottom: "182px" }}
+            id="nextButton"
+            onClick={onSubmit}
+          >
+            Kaydımı Kesinleştir!
+          </button>
+        </Link>
       </div>
     </>
   );
