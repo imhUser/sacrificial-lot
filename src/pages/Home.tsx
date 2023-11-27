@@ -361,7 +361,7 @@ const Home = () => {
                     }}
                   >
                     <div style={{ display: "flex" }}>{shareCostButtons}</div>
-                    <div
+                    {/* <div
                       style={{
                         display: "flex",
                         marginTop: "15px",
@@ -392,7 +392,7 @@ const Home = () => {
                       >
                         13500<span>₺</span>
                       </button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
