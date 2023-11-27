@@ -1,6 +1,19 @@
+import { useLocation } from "react-router-dom";
 import CowImage from "../assets/images/cow.png";
 
+interface Props {
+  fullName: string;
+  address: string;
+  shareQuantity: number;
+  shareCost: string;
+  deliveryType: string;
+  phone: string;
+}
+
 const ShareInfo = () => {
+  const shareOwnerInfo: Props = useLocation().state;
+  console.log(useLocation());
+  console.log(shareOwnerInfo.fullName);
   return (
     <>
       <div className="container">
@@ -27,14 +40,14 @@ const ShareInfo = () => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Harun Özçelik</td>
+                    <td>{shareOwnerInfo.fullName}</td>
                     <td>123</td>
                     <td>456</td>
                     <td>10:30</td>
-                    <td>1000 TL</td>
-                    <td>555-1234</td>
+                    <td>{shareOwnerInfo.shareCost} TL</td>
+                    <td>{shareOwnerInfo.phone}</td>
                     <td>2023-05-06</td>
-                    <td>Kapıda Ödeme</td>
+                    <td>{shareOwnerInfo.deliveryType}</td>
                     <td>
                       <span
                         style={{
@@ -107,6 +120,17 @@ const ShareInfo = () => {
               <p style={{ marginTop: "15px" }}>
                 <span style={{ fontWeight: "600" }}>Kesim Noktası: </span>
                 <span> Sarılar Köyü, Kahramankazan/Ankara</span>
+                <div>
+                  <a href="https://maps.app.goo.gl/3szRPFNfeGugJjPo7" target="_blank" style={{textDecoration: "none", color:"black"}}>
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ color: "#05a75b" }}
+                  >
+                    location_on
+                  </span>
+                  Haritalarda Görüntüleyin
+                  </a>
+                </div>
               </p>
             </div>
           </div>
