@@ -1,5 +1,11 @@
 body {
   font-family: "Poppins", sans-serif;
+  background: rgb(255, 255, 255);
+  background: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 1) 28%,
+    rgba(239, 255, 236, 1) 100%
+  );
 }
 
 .invisible {
