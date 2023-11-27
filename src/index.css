@@ -282,7 +282,12 @@ tbody tr td {
   background-color: #ebf5f3;
 }
 
-.table td:nth-of-type(9) {
+/* .table td:nth-of-type(9) {
   background-color: #bcf3e1;
   color: #1a9f75;
+} */
+
+.table thead th {
+  color: #004e24;
+  background: #f6fbf9;
 }

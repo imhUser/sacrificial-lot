@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Confirmation from "./pages/Confirmation";
 import Finalization from "./pages/Finalization";
+import ShareInfo from "./pages/ShareInfo";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Home/>}/>
           <Route path="/confirmation" element={<Confirmation/>}/>
           <Route path="/finalization" element={<Finalization/>}/>
+          <Route path="/shareInfo" element={<ShareInfo/>}/>
         </Routes>
         <Footer />
       </Router>
