@@ -77,7 +77,17 @@ const Confirmation = () => {
         })
           .then((result) => {
             console.log("share owner saved");
-            navigate("/finalization");
+            navigate("/shareInfo", {
+              state: {
+                fullName: fullName,
+                phone: phone,
+                address: address,
+                deliveryType: deliveryType,
+                shareCost: shareCost,
+                shareQuantity: shareQuantity,
+                isNewShareOwner: true
+              },
+            });
           })
           .catch((error) => {
             console.log("share owner not saved");

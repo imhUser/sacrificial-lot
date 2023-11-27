@@ -8,6 +8,7 @@ interface Props {
   shareCost: string;
   deliveryType: string;
   phone: string;
+  isNewShareOwner: boolean;
 }
 
 const ShareInfo = () => {
@@ -18,9 +19,18 @@ const ShareInfo = () => {
     <>
       <div className="container">
         <div className="row">
-          <div className="d-flex justify-content-center">
-            <p className="sorgulama">Hisse Sorgulama</p>
-          </div>
+          {shareOwnerInfo.isNewShareOwner ? (
+            <div className="tesekkur">
+              <p className="d-flex justify-content-center">Teşekkürler</p>
+              <p className="d-flex justify-content-center">
+                Hisse kaydınız başarıyla gerçekleştirilmiştir
+              </p>
+            </div>
+          ) : (
+            <div className="d-flex justify-content-center">
+              <p className="sorgulama">Hisse Sorgulama</p>
+            </div>
+          )}
           <div>
             <div className="container-fluid">
               <table className="table table-borderless">
@@ -121,14 +131,18 @@ const ShareInfo = () => {
                 <span style={{ fontWeight: "600" }}>Kesim Noktası: </span>
                 <span> Sarılar Köyü, Kahramankazan/Ankara</span>
                 <div>
-                  <a href="https://maps.app.goo.gl/3szRPFNfeGugJjPo7" target="_blank" style={{textDecoration: "none", color:"black"}}>
-                  <span
-                    className="material-symbols-outlined"
-                    style={{ color: "#05a75b" }}
+                  <a
+                    href="https://maps.app.goo.gl/3szRPFNfeGugJjPo7"
+                    target="_blank"
+                    style={{ textDecoration: "none", color: "black" }}
                   >
-                    location_on
-                  </span>
-                  Haritalarda Görüntüleyin
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ color: "#05a75b" }}
+                    >
+                      location_on
+                    </span>
+                    Haritalarda Görüntüleyin
                   </a>
                 </div>
               </p>
