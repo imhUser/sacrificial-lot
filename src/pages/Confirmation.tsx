@@ -1,7 +1,12 @@
-import { useLocation, Link } from "react-router-dom";
-import { db } from "../config/firebase";
+import { useLocation, Link, useNavigate } from "react-router-dom";
+import { db, auth } from "../config/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { useState, useEffect } from "react";
+import {
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
+  ConfirmationResult,
+} from "firebase/auth";
 
 interface Props {
   deliveryType: string;
@@ -11,10 +16,11 @@ interface Props {
 
 const Confirmation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const fromHome: Props = location.state.fromHome;
 
   const [fullName, setFullName] = useState<string>("");
-  const [telephone, setTelephone] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [deliveryType, setDeliveryType] = useState<string>("");
   const [shareCost, setShareCost] = useState<string>("");
@@ -28,21 +34,47 @@ const Confirmation = () => {
     }
   });
 
-  const shareOwnersRef = collection(db, "shareOwners");
+  const [code, setCode] = useState("");
+  const [confirmation, setConfirmation] = useState<ConfirmationResult>();
+  const [openVerifyNode, setOpenVerifyNode] = useState(false);
+  const onSendSMSCode = async () => {
+    setOpenVerifyNode(true);
+    const recaptchaVerifier = new RecaptchaVerifier(auth, "sign-in-button", {});
+    recaptchaVerifier.render();
+    const confirmation = await signInWithPhoneNumber(
+      auth,
+      phone,
+      recaptchaVerifier
+    );
+    setConfirmation(confirmation);
+  };
 
-  const onSubmit = async () => {
-    try {
-      await addDoc(shareOwnersRef, {
-        fullName: fullName,
-        telephone: telephone,
-        address: address,
-        deliveryType: deliveryType,
-        shareCost: shareCost,
-        shareQuantity: shareQuantity,
+  const shareOwnersRef = collection(db, "shareOwners");
+  const onVerifyCode = async () => {
+    await confirmation
+      ?.confirm(code)
+      .then((result) => {
+        console.log("code verified");
+        addDoc(shareOwnersRef, {
+          fullName: fullName,
+          phone: phone,
+          address: address,
+          deliveryType: deliveryType,
+          shareCost: shareCost,
+          shareQuantity: shareQuantity,
+        })
+          .then((result) => {
+            console.log("share owner saved");
+            navigate("/finalization");
+          })
+          .catch((error) => {
+            console.log("share owner not saved");
+          });
+      })
+      .catch((error) => {
+        // User couldn't sign in (bad verification code?)
+        console.error("code not verified");
       });
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   return (
@@ -141,9 +173,9 @@ const Confirmation = () => {
                       type="tel"
                       className="form-control inputlar"
                       id="tel"
-                      maxLength={11}
+                      maxLength={13}
                       placeholder="555 555 55 55"
-                      onChange={(e) => setTelephone(e.target.value)}
+                      onChange={(e) => setPhone(e.target.value)}
                     />
                   </div>
                 </div>
@@ -195,7 +227,7 @@ const Confirmation = () => {
       </div>
 
       <div className="button d-flex justify-content-center">
-        <Link style={{ textDecoration: "none" }} to="/finalization">
+        {/* <Link style={{ textDecoration: "none" }} to="/finalization">
           <button
             type="button"
             className="btn btn-success"
@@ -205,8 +237,32 @@ const Confirmation = () => {
           >
             Kaydımı Kesinleştir!
           </button>
-        </Link>
+        </Link> */}
+
+        <button
+          type="button"
+          className="btn btn-success"
+          // style={{ marginBottom: "182px" }}
+          style={{ marginBottom: "60px" }}
+          id="nextButton"
+          onClick={onSendSMSCode}
+        >
+          Kaydımı Kesinleştir!
+        </button>
       </div>
+
+      <div className="button d-flex justify-content-center">
+        <div id="sign-in-button" />
+      </div>
+      {openVerifyNode && (
+        <div
+          className="button d-flex justify-content-center"
+          style={{ marginTop: "10vh", marginBottom: "25vh" }}
+        >
+          <input onChange={(e) => setCode(e.target.value)} />
+          <button onClick={onVerifyCode}></button>
+        </div>
+      )}
     </>
   );
 };
