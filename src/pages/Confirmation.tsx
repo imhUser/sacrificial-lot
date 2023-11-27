@@ -7,6 +7,7 @@ import {
   RecaptchaVerifier,
   ConfirmationResult,
 } from "firebase/auth";
+import Button from "../components/Button";
 
 interface Props {
   deliveryType: string;
@@ -36,18 +37,29 @@ const Confirmation = () => {
 
   const [code, setCode] = useState("");
   const [confirmation, setConfirmation] = useState<ConfirmationResult>();
-  const [openVerifyNode, setOpenVerifyNode] = useState(false);
+  const [isOpenSMSCodeSection, setIsOpenSMSCodeSection] = useState(false);
   const onSendSMSCode = async () => {
-    setOpenVerifyNode(true);
-    const recaptchaVerifier = new RecaptchaVerifier(auth, "sign-in-button", {});
-    recaptchaVerifier.render();
-    const confirmation = await signInWithPhoneNumber(
-      auth,
-      phone,
-      recaptchaVerifier
-    );
-    setConfirmation(confirmation);
+    const recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-section", {
+      size: "invisible",
+      callback: async () => {
+        console.log("recaptcha verified!");
+        await sendSMSToPhone(recaptchaVerifier);
+      },
+    });
+    await recaptchaVerifier.verify();
   };
+
+  async function sendSMSToPhone(recaptchaVerifier: RecaptchaVerifier) {
+    await signInWithPhoneNumber(auth, phone, recaptchaVerifier)
+      .then((result) => {
+        setIsOpenSMSCodeSection(true);
+        setConfirmation(result);
+      })
+      .catch((error) => {
+        console.log("sign in with phone failure");
+        console.log(error);
+      });
+  }
 
   const shareOwnersRef = collection(db, "shareOwners");
   const onVerifyCode = async () => {
@@ -252,15 +264,24 @@ const Confirmation = () => {
       </div>
 
       <div className="button d-flex justify-content-center">
-        <div id="sign-in-button" />
+        <div id="recaptcha-section" />
       </div>
-      {openVerifyNode && (
-        <div
-          className="button d-flex justify-content-center"
-          style={{ marginTop: "10vh", marginBottom: "25vh" }}
-        >
-          <input onChange={(e) => setCode(e.target.value)} />
-          <button onClick={onVerifyCode}></button>
+
+      {isOpenSMSCodeSection && (
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-4" style={{ marginBottom: "15vh" }}>
+              <input
+                className="form-control inputlar"
+                onChange={(e) => setCode(e.target.value)}
+              />
+              <Button
+                buttonTitle="Kodu Doğrula"
+                additionalStyles={["btn-success"]}
+                onClick={onVerifyCode}
+              ></Button>
+            </div>
+          </div>
         </div>
       )}
     </>
