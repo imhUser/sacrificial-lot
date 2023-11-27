@@ -4,12 +4,25 @@ import CheckMarkImage from "../assets/images/check-mark.png";
 import HygienicImage from "../assets/images/hygienic.png";
 import { useState, useEffect } from "react";
 import Button from "../components/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../config/firebase";
+
+interface Props {
+  fullName: string;
+  address: string;
+  shareQuantity: number;
+  shareCost: string;
+  deliveryType: string;
+  phone: string;
+}
 
 const Home = () => {
   const [deliveryType, setDeliveryType] = useState<string>();
   const [shareCost, setShareCost] = useState<string>();
   const [shareQuantity, setShareQuantity] = useState<number>();
+
+  const [phone, setPhone] = useState<string>("");
 
   // const location = useLocation();
   // const fromConfirmation = location.state?.fromConfirmation;
@@ -36,7 +49,7 @@ const Home = () => {
     //   setShareCost(fromConfirmation.shareCost)
     //   setShareQuantity(fromConfirmation.shareQuantity)
     // }
-    
+
     // run something every time name changes
     console.log(deliveryType + " , " + shareCost + " , " + shareQuantity);
   }, [deliveryType, shareCost, shareQuantity]);
@@ -92,6 +105,40 @@ const Home = () => {
         );
   }
 
+  const shareOwnersRef = collection(db, "shareOwners");
+  const q = query(shareOwnersRef, where("phone", "==", phone));
+  const navigate = useNavigate();
+  const getShareOwnerInfo = async () => {
+    const querySnapshot = await getDocs(q);
+    let shareOwnerInfo: Props = {
+      fullName: "",
+      address: "",
+      phone: "",
+      shareCost: "",
+      shareQuantity: 0,
+      deliveryType: "",
+    };
+    if (!querySnapshot.empty) {
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
+        shareOwnerInfo = doc.data() as Props;
+      });
+    } else {
+      throw new Error("Something bad happened");
+    }
+    return shareOwnerInfo;
+  };
+
+  const onFindShareOwner = () => {
+    getShareOwnerInfo()
+      .then((shareOwnerInfo) => {
+        navigate("/shareInfo", { state: shareOwnerInfo });
+      })
+      .catch((e) => {
+        console.log("cannot find share owner that have it phone number");
+      });
+  };
+
   return (
     <>
       {/* first part */}
@@ -136,12 +183,14 @@ const Home = () => {
                 placeholder="Telefon Numaranız"
                 aria-label="Recipient's username"
                 aria-describedby="button-addon2"
+                onChange={(e) => setPhone(e.target.value)}
               />
               <button
                 className="btn btn-outline-secondary"
                 type="button"
                 id="button-addon2"
                 style={{ marginLeft: "20px", borderRadius: "5px" }}
+                onClick={onFindShareOwner}
               >
                 Hissemi Sorgula
               </button>
@@ -559,7 +608,7 @@ const Home = () => {
                   deliveryType: deliveryType,
                   shareCost: shareCost,
                   shareQuantity: shareQuantity,
-                }
+                },
               }}
             >
               <button
