@@ -7,6 +7,7 @@ import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { ShareOwner } from "../models/shareOwner";
 
 interface Props {
   fullName: string;
@@ -24,11 +25,10 @@ const Home = () => {
 
   const [phone, setPhone] = useState<string>("");
 
-  // const location = useLocation();
-  // const fromConfirmation = location.state?.fromConfirmation;
-  // if (fromConfirmation !== null) {
-  //   console.log("nulllllllll")
-  // }
+  const [loading, setLoading] = useState(true);
+  const [shareOwnerList, setShareOwnerList] = useState<ShareOwner[]>([]);
+
+  const shareOwnersRef = collection(db, "shareOwners");
 
   const onClickDeliveryType = (deliveryType: string) => {
     setDeliveryType(deliveryType);
@@ -43,15 +43,8 @@ const Home = () => {
   };
 
   useEffect(() => {
-    // if (fromConfirmation !== null) {
-    //   console.log("buraya girdi")
-    //   setDeliveryType(fromConfirmation.deliveryType)
-    //   setShareCost(fromConfirmation.shareCost)
-    //   setShareQuantity(fromConfirmation.shareQuantity)
-    // }
-
-    // run something every time name changes
     console.log(deliveryType + " , " + shareCost + " , " + shareQuantity);
+    getShareOwners();
   }, [deliveryType, shareCost, shareQuantity]);
 
   // set share quantity html buttons
@@ -105,11 +98,37 @@ const Home = () => {
         );
   }
 
-  const shareOwnersRef = collection(db, "shareOwners");
-  const q = query(shareOwnersRef, where("phone", "==", phone));
+  // set share owners html table
+  const getShareOwners = async () => {
+    await getDocs(shareOwnersRef).then((result) => {
+      if (!result.empty) {
+        result.forEach((doc) => {
+          setShareOwnerList([...shareOwnerList, doc.data() as ShareOwner]);
+        });
+      } else {
+        console.error("share owner docs is empty");
+      }
+    });
+    setLoading(false);
+  };
+  const setShareOwnerTableItems = () => {
+    return shareOwnerList.map((item, index) => (
+      <tr key={index}>
+        <td>{item.cuttingTime}</td>
+        <td></td>
+        <td>{item.fullName}</td>
+        <td>5</td>
+      </tr>
+    ));
+  }
+
+  const qetShareOwnersByPhone = query(
+    shareOwnersRef,
+    where("phone", "==", phone)
+  );
   const navigate = useNavigate();
   const getShareOwnerInfo = async () => {
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocs(qetShareOwnersByPhone);
     let shareOwnerInfo: Props = {
       fullName: "",
       address: "",
@@ -328,8 +347,64 @@ const Home = () => {
       {/* fourth part */}
       <div className="container">
         <div className="row teslimat">
-          {/* Sol Seçim */}
-          <div className="col-lg-6" style={{ marginTop: "59px" }}>
+          {/* Tablo */}
+          <div className="col" style={{ marginTop: "59px" }}>
+            <div className="d-flex">
+              <p className="teslimat-yazi">Saat Seçimi</p>
+              <p
+                style={{
+                  marginLeft: "15px",
+                  display: "flex",
+                  alignItems: "end",
+                  fontSize: "15px",
+                  color: "#8f8f8f",
+                }}
+              >
+                29 Haziran, Perşembe
+              </p>
+            </div>
+
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Saat</th>
+                    <th>Hisse No</th>
+                    <th>İlk Hisse Sahibi</th>
+                    <th>Boş Hisse Sayısı</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td>Loading...</td>
+                    </tr>
+                  ) : (
+                    setShareOwnerTableItems()
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <div
+              className="alert alert-primary d-flex align-content-center"
+              role="alert"
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{ marginRight: "13px" }}
+              >
+                error
+              </span>
+              <span style={{ fontSize: "12px", lineHeight: "18px" }}>
+                Kurbanlarımız kesildikten sonra parçalanma süresi 2.30 - 3 saati
+                bulabilmektedir.
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="row teslimat">
+          {/* Hisse Seçim */}
+          <div className="col" style={{ marginTop: "59px" }}>
             <div className="teslimat-türü">
               <p className="teslimat-yazi">Teslimat Türü</p>
               <div id="button-group1" className="button-teslimat-turu d-flex">
@@ -407,198 +482,6 @@ const Home = () => {
               >
                 {shareQuantityButtons}
               </div>
-            </div>
-          </div>
-
-          {/* Sağ Tablo */}
-          <div className="col-lg-6" style={{ marginTop: "59px" }}>
-            <div className="d-flex">
-              <p className="teslimat-yazi">Saat Seçimi</p>
-              <p
-                style={{
-                  marginLeft: "15px",
-                  display: "flex",
-                  alignItems: "end",
-                  fontSize: "15px",
-                  color: "#8f8f8f",
-                }}
-              >
-                29 Haziran, Perşembe
-              </p>
-            </div>
-
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Saat</th>
-                    <th>Hisse No</th>
-                    <th>İlk Hisse Sahibi</th>
-                    <th>Boş Hisse Sayısı</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>09:00</td>
-                    <td>123</td>
-                    <td>Ali</td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td>09:15</td>
-                    <td>456</td>
-                    <td>Ahmet</td>
-                    <td>10</td>
-                  </tr>
-                  <tr>
-                    <td>09:30</td>
-                    <td>789</td>
-                    <td>Mehmet</td>
-                    <td>3</td>
-                  </tr>
-                  <tr>
-                    <td>09:00</td>
-                    <td>123</td>
-                    <td>Ali</td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td>09:15</td>
-                    <td>456</td>
-                    <td>Ahmet</td>
-                    <td>10</td>
-                  </tr>
-                  <tr>
-                    <td>09:30</td>
-                    <td>789</td>
-                    <td>Mehmet</td>
-                    <td>3</td>
-                  </tr>
-                  <tr>
-                    <td>09:00</td>
-                    <td>123</td>
-                    <td>Ali</td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td>09:15</td>
-                    <td>456</td>
-                    <td>Ahmet</td>
-                    <td>10</td>
-                  </tr>
-                  <tr>
-                    <td>09:30</td>
-                    <td>789</td>
-                    <td>Mehmet</td>
-                    <td>3</td>
-                  </tr>
-                  <tr>
-                    <td>09:00</td>
-                    <td>123</td>
-                    <td>Ali</td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td>09:15</td>
-                    <td>456</td>
-                    <td>Ahmet</td>
-                    <td>10</td>
-                  </tr>
-                  <tr>
-                    <td>09:30</td>
-                    <td>789</td>
-                    <td>Mehmet</td>
-                    <td>3</td>
-                  </tr>
-                  <tr>
-                    <td>09:00</td>
-                    <td>123</td>
-                    <td>Ali</td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td>09:15</td>
-                    <td>456</td>
-                    <td>Ahmet</td>
-                    <td>10</td>
-                  </tr>
-                  <tr>
-                    <td>09:30</td>
-                    <td>789</td>
-                    <td>Mehmet</td>
-                    <td>3</td>
-                  </tr>
-                  <tr>
-                    <td>09:00</td>
-                    <td>123</td>
-                    <td>Ali</td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td>09:15</td>
-                    <td>456</td>
-                    <td>Ahmet</td>
-                    <td>10</td>
-                  </tr>
-                  <tr>
-                    <td>09:30</td>
-                    <td>789</td>
-                    <td>Mehmet</td>
-                    <td>3</td>
-                  </tr>
-                  <tr>
-                    <td>09:00</td>
-                    <td>123</td>
-                    <td>Ali</td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td>09:15</td>
-                    <td>456</td>
-                    <td>Ahmet</td>
-                    <td>10</td>
-                  </tr>
-                  <tr>
-                    <td>09:30</td>
-                    <td>789</td>
-                    <td>Mehmet</td>
-                    <td>3</td>
-                  </tr>
-                  <tr>
-                    <td>09:00</td>
-                    <td>123</td>
-                    <td>Ali</td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td>09:15</td>
-                    <td>456</td>
-                    <td>Ahmet</td>
-                    <td>10</td>
-                  </tr>
-                  <tr>
-                    <td>09:30</td>
-                    <td>789</td>
-                    <td>Mehmet</td>
-                    <td>3</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div
-              className="alert alert-primary d-flex align-content-center"
-              role="alert"
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{ marginRight: "13px" }}
-              >
-                error
-              </span>
-              <span style={{ fontSize: "12px", lineHeight: "18px" }}>
-                Kurbanlarımız kesildikten sonra parçalanma süresi 2.30 - 3 saati
-                bulabilmektedir.
-              </span>
             </div>
             <Link
               style={{ textDecoration: "none" }}
