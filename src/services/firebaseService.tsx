@@ -5,8 +5,12 @@ import {
   RecaptchaVerifier,
   ConfirmationResult,
 } from "firebase/auth";
+import { ShareOwnerService } from "./shareOwnerService";
+import { ShareOwner } from "../models/shareOwner";
 
 export class FirebaseService {
+  private _shareOwnerService = new ShareOwnerService();
+
   getCollectionRef = (collectionName: string) => {
     return collection(db, collectionName);
   };
@@ -38,5 +42,22 @@ export class FirebaseService {
       },
     });
     await recaptchaVerifier.verify();
+  }
+
+  async verifyCode(
+    confirmation?: ConfirmationResult,
+    code: string = "",
+    shareOwner: ShareOwner = {} as ShareOwner
+  ) {
+    await confirmation
+      ?.confirm(code)
+      .then((result) => {
+        console.log("code verified");
+        return this._shareOwnerService.addShareOwner(shareOwner);
+      })
+      .catch((error) => {
+        // User couldn't sign in (bad verification code?)
+        console.error("code not verified");
+      });
   }
 }

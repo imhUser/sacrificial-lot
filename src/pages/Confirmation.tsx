@@ -1,14 +1,9 @@
 import { useLocation, Link, useNavigate } from "react-router-dom";
-import { db, auth } from "../config/firebase";
-import { collection, addDoc } from "firebase/firestore";
 import { useState, useEffect } from "react";
-import {
-  signInWithPhoneNumber,
-  RecaptchaVerifier,
-  ConfirmationResult,
-} from "firebase/auth";
+import { ConfirmationResult } from "firebase/auth";
 import Button from "../components/Button";
 import { FirebaseService } from "../services/firebaseService";
+import { ShareOwner } from "../models/shareOwner";
 
 interface Props {
   deliveryType: string;
@@ -41,44 +36,32 @@ const Confirmation = () => {
   const [confirmation, setConfirmation] = useState<ConfirmationResult>();
   const [isOpenSMSCodeSection, setIsOpenSMSCodeSection] = useState(false);
   const onSendSMSCode = async () => {
-    await _firebaseService.sendSMSToPhone(phone, setIsOpenSMSCodeSection, setConfirmation);
+    await _firebaseService.sendSMSToPhone(
+      phone,
+      setIsOpenSMSCodeSection,
+      setConfirmation
+    );
   };
 
-  const shareOwnersRef = _firebaseService.getCollectionRef("shareOwners");
   const onVerifyCode = async () => {
-    await confirmation
-      ?.confirm(code)
+    await _firebaseService
+      .verifyCode(confirmation, code, {} as ShareOwner)
       .then((result) => {
-        console.log("code verified");
-        addDoc(shareOwnersRef, {
-          fullName: fullName,
-          phone: phone,
-          address: address,
-          deliveryType: deliveryType,
-          shareCost: shareCost,
-          shareQuantity: shareQuantity,
-        })
-          .then((result) => {
-            console.log("share owner saved");
-            navigate("/shareInfo", {
-              state: {
-                fullName: fullName,
-                phone: phone,
-                address: address,
-                deliveryType: deliveryType,
-                shareCost: shareCost,
-                shareQuantity: shareQuantity,
-                isNewShareOwner: true,
-              },
-            });
-          })
-          .catch((error) => {
-            console.log("share owner not saved");
-          });
+        console.log("share owner saved");
+        navigate("/shareInfo", {
+          state: {
+            fullName: fullName,
+            phone: phone,
+            address: address,
+            deliveryType: deliveryType,
+            shareCost: shareCost,
+            shareQuantity: shareQuantity,
+            isNewShareOwner: true,
+          },
+        });
       })
       .catch((error) => {
-        // User couldn't sign in (bad verification code?)
-        console.error("code not verified");
+        console.log("share owner not saved");
       });
   };
 
