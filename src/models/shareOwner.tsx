@@ -25,11 +25,31 @@ export class ShareOwner {
     this._cuttingTime = cuttingTime;
   }
 
-  public get cuttingTime() {
-    return this._cuttingTime;
-  }
-
   public get fullName() {
     return this._fullName;
+  }
+
+  public get phone() {
+    return this._phone;
+  }
+
+  public get address() {
+    return this._address;
+  }
+
+  public get deliveryType() {
+    return this._deliveryType;
+  }
+
+  public get shareCost() {
+    return this._shareCost;
+  }
+
+  public get shareQuantity() {
+    return this._shareQuantity;
+  }
+
+  public get cuttingTime() {
+    return this._cuttingTime;
   }
 }
