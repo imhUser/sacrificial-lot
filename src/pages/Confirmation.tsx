@@ -8,6 +8,7 @@ import {
   ConfirmationResult,
 } from "firebase/auth";
 import Button from "../components/Button";
+import { FirebaseService } from "../services/firebaseService";
 
 interface Props {
   deliveryType: string;
@@ -19,6 +20,7 @@ const Confirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const fromHome: Props = location.state.fromHome;
+  const _firebaseService = new FirebaseService();
 
   const [fullName, setFullName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
@@ -39,29 +41,10 @@ const Confirmation = () => {
   const [confirmation, setConfirmation] = useState<ConfirmationResult>();
   const [isOpenSMSCodeSection, setIsOpenSMSCodeSection] = useState(false);
   const onSendSMSCode = async () => {
-    const recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-section", {
-      size: "invisible",
-      callback: async () => {
-        console.log("recaptcha verified!");
-        await sendSMSToPhone(recaptchaVerifier);
-      },
-    });
-    await recaptchaVerifier.verify();
+    await _firebaseService.sendSMSToPhone(phone, setIsOpenSMSCodeSection, setConfirmation);
   };
 
-  async function sendSMSToPhone(recaptchaVerifier: RecaptchaVerifier) {
-    await signInWithPhoneNumber(auth, phone, recaptchaVerifier)
-      .then((result) => {
-        setIsOpenSMSCodeSection(true);
-        setConfirmation(result);
-      })
-      .catch((error) => {
-        console.log("sign in with phone failure");
-        console.log(error);
-      });
-  }
-
-  const shareOwnersRef = collection(db, "shareOwners");
+  const shareOwnersRef = _firebaseService.getCollectionRef("shareOwners");
   const onVerifyCode = async () => {
     await confirmation
       ?.confirm(code)
@@ -85,7 +68,7 @@ const Confirmation = () => {
                 deliveryType: deliveryType,
                 shareCost: shareCost,
                 shareQuantity: shareQuantity,
-                isNewShareOwner: true
+                isNewShareOwner: true,
               },
             });
           })
