@@ -5,9 +5,10 @@ import HygienicImage from "../assets/images/hygienic.png";
 import { useState, useEffect } from "react";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../config/firebase";
+import { query, where, getDocs } from "firebase/firestore";
 import { ShareOwner } from "../models/shareOwner";
+import { ShareOwnerService } from "../services/shareOwnerService";
+import { getCollectionRef } from "../services/firebaseService";
 
 interface Props {
   fullName: string;
@@ -28,7 +29,9 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [shareOwnerList, setShareOwnerList] = useState<ShareOwner[]>([]);
 
-  const shareOwnersRef = collection(db, "shareOwners");
+  const shareOwnersRef = getCollectionRef("shareOwner");
+
+  const _shareOwnerService = new ShareOwnerService();
 
   const onClickDeliveryType = (deliveryType: string) => {
     setDeliveryType(deliveryType);
@@ -44,7 +47,13 @@ const Home = () => {
 
   useEffect(() => {
     console.log(deliveryType + " , " + shareCost + " , " + shareQuantity);
-    getShareOwners();
+
+    _shareOwnerService.getAllShareOwners().then(result=>{
+      if (result.length > 0) {
+        setShareOwnerList(result);
+        setLoading(false);
+      }
+    });
   }, [deliveryType, shareCost, shareQuantity]);
 
   // set share quantity html buttons
@@ -98,19 +107,7 @@ const Home = () => {
         );
   }
 
-  // set share owners html table
-  const getShareOwners = async () => {
-    await getDocs(shareOwnersRef).then((result) => {
-      if (!result.empty) {
-        result.forEach((doc) => {
-          setShareOwnerList([...shareOwnerList, doc.data() as ShareOwner]);
-        });
-      } else {
-        console.error("share owner docs is empty");
-      }
-    });
-    setLoading(false);
-  };
+  // set share owners html table items
   const setShareOwnerTableItems = () => {
     return shareOwnerList.map((item, index) => (
       <tr key={index}>
