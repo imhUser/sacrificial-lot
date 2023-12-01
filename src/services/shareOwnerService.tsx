@@ -1,5 +1,5 @@
 import { FirebaseService } from "./firebaseService";
-import { getDocs, query, where } from "firebase/firestore";
+import { getDocs, query, where, addDoc } from "firebase/firestore";
 import { ShareOwner } from "../models/shareOwner";
 
 export class ShareOwnerService {
@@ -31,5 +31,9 @@ export class ShareOwnerService {
     } else {
       throw new Error("Something bad happened");
     }
+  }
+
+  async addShareOwner(shareOwner: ShareOwner) {
+    return await addDoc(this._shareOwnerCollectionRef, shareOwner);
   }
 }
