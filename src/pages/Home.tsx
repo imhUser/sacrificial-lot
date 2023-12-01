@@ -29,8 +29,6 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [shareOwnerList, setShareOwnerList] = useState<ShareOwner[]>([]);
 
-  const shareOwnersRef = getCollectionRef("shareOwners");
-
   const _shareOwnerService = new ShareOwnerService();
 
   const onClickDeliveryType = (deliveryType: string) => {
