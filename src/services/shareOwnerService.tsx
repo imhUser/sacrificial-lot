@@ -1,9 +1,11 @@
-import { getCollectionRef } from "./firebaseService";
+import { FirebaseService } from "./firebaseService";
 import { getDocs, query, where } from "firebase/firestore";
 import { ShareOwner } from "../models/shareOwner";
 
 export class ShareOwnerService {
-  private _shareOwnerCollectionRef = getCollectionRef("shareOwners");
+  private _firebaseService = new FirebaseService();
+  private _shareOwnerCollectionRef =
+    this._firebaseService.getCollectionRef("shareOwners");
 
   async getAllShareOwners() {
     const shareOwnerList: ShareOwner[] = [];
