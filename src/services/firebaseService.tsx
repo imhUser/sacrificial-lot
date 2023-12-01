@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 import { db, auth } from "../config/firebase";
 import {
   signInWithPhoneNumber,
