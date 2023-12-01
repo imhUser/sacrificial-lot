@@ -29,7 +29,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [shareOwnerList, setShareOwnerList] = useState<ShareOwner[]>([]);
 
-  const shareOwnersRef = getCollectionRef("shareOwner");
+  const shareOwnersRef = getCollectionRef("shareOwners");
 
   const _shareOwnerService = new ShareOwnerService();
 
@@ -119,34 +119,10 @@ const Home = () => {
     ));
   }
 
-  const qetShareOwnersByPhone = query(
-    shareOwnersRef,
-    where("phone", "==", phone)
-  );
+  
   const navigate = useNavigate();
-  const getShareOwnerInfo = async () => {
-    const querySnapshot = await getDocs(qetShareOwnersByPhone);
-    let shareOwnerInfo: Props = {
-      fullName: "",
-      address: "",
-      phone: "",
-      shareCost: "",
-      shareQuantity: 0,
-      deliveryType: "",
-    };
-    if (!querySnapshot.empty) {
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
-        shareOwnerInfo = doc.data() as Props;
-      });
-    } else {
-      throw new Error("Something bad happened");
-    }
-    return shareOwnerInfo;
-  };
-
   const onFindShareOwner = () => {
-    getShareOwnerInfo()
+    _shareOwnerService.getShareOwner(phone)
       .then((shareOwnerInfo) => {
         navigate("/shareInfo", { state: shareOwnerInfo });
       })
