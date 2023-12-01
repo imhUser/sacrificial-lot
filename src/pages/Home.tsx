@@ -5,19 +5,8 @@ import HygienicImage from "../assets/images/hygienic.png";
 import { useState, useEffect } from "react";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
-import { query, where, getDocs } from "firebase/firestore";
 import { ShareOwner } from "../models/shareOwner";
 import { ShareOwnerService } from "../services/shareOwnerService";
-import { getCollectionRef } from "../services/firebaseService";
-
-interface Props {
-  fullName: string;
-  address: string;
-  shareQuantity: number;
-  shareCost: string;
-  deliveryType: string;
-  phone: string;
-}
 
 const Home = () => {
   const [deliveryType, setDeliveryType] = useState<string>();
