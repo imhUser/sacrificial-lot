@@ -20,7 +20,7 @@ export class ShareOwnerService {
     return shareOwnerList;
   }
 
-  async getShareOwner(phone: string) {
+  async getShareOwnerByPhone(phone: string) {
     const querySnapshot = await getDocs(
       query(this._shareOwnerCollectionRef, where("phone", "==", phone))
     );

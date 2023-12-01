@@ -122,7 +122,7 @@ const Home = () => {
   
   const navigate = useNavigate();
   const onFindShareOwner = () => {
-    _shareOwnerService.getShareOwner(phone)
+    _shareOwnerService.getShareOwnerByPhone(phone)
       .then((shareOwnerInfo) => {
         navigate("/shareInfo", { state: shareOwnerInfo });
       })
