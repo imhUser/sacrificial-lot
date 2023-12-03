@@ -3,14 +3,14 @@ import { getDocs, query, where, addDoc } from "firebase/firestore";
 import { ShareOwner } from "../models/shareOwner";
 
 export class ShareOwnerService {
-  private _firebaseService = new FirebaseService();
-  private _shareOwnerCollectionRef =
+  private static _firebaseService = new FirebaseService();
+  private static _shareOwnerCollectionRef =
     this._firebaseService.getCollectionRef("shareOwners");
 
   async getAllShareOwners() {
     const shareOwnerList: ShareOwner[] = [];
 
-    await getDocs(this._shareOwnerCollectionRef).then((result) => {
+    await getDocs(ShareOwnerService._shareOwnerCollectionRef).then((result) => {
       if (!result.empty) {
         result.forEach((doc) => {
           shareOwnerList.push(doc.data() as ShareOwner);
@@ -24,7 +24,7 @@ export class ShareOwnerService {
 
   async getShareOwnerByPhone(phone: string) {
     const querySnapshot = await getDocs(
-      query(this._shareOwnerCollectionRef, where("phone", "==", phone))
+      query(ShareOwnerService._shareOwnerCollectionRef, where("phone", "==", phone))
     );
     if (!querySnapshot.empty) {
       return querySnapshot.docs[0].data() as ShareOwner;
@@ -34,6 +34,6 @@ export class ShareOwnerService {
   }
 
   async addShareOwner(shareOwner: ShareOwner) {
-    return await addDoc(this._shareOwnerCollectionRef, shareOwner);
+    return await addDoc(ShareOwnerService._shareOwnerCollectionRef, shareOwner);
   }
 }
