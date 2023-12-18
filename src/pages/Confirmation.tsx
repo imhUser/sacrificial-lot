@@ -45,7 +45,17 @@ const Confirmation = () => {
 
   const onVerifyCode = async () => {
     await _firebaseService
-      .verifyCode(confirmation, code, {} as ShareOwner)
+      .verifyCode(confirmation, code, {
+        fullName: fullName,
+        phone: phone,
+        address: address,
+        shareCost: shareCost,
+        shareQuantity: shareQuantity,
+        deliveryType: deliveryType,
+        code: code,
+        cuttingTime: "9:45",
+        animalID: "1"
+      } as ShareOwner)
       .then((result) => {
         console.log("share owner saved");
         navigate("/shareInfo", {

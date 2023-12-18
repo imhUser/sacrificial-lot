@@ -6,6 +6,8 @@ export class ShareOwner {
   private _shareCost?: string;
   private _shareQuantity?: number;
   private _cuttingTime?: string;
+  private _code?: string;
+  private _animalID?: string;
 
   constructor(
     fullName?: string,
@@ -14,7 +16,9 @@ export class ShareOwner {
     deliveryType?: string,
     shareCost?: string,
     shareQuantity?: number,
-    cuttingTime?: string
+    cuttingTime?: string,
+    code?: string,
+    animalID?: string
   ) {
     this._fullName = fullName;
     this._phone = phone;
@@ -23,6 +27,8 @@ export class ShareOwner {
     this._shareCost = shareCost;
     this._shareQuantity = shareQuantity;
     this._cuttingTime = cuttingTime;
+    this._code = code;
+    this._animalID= animalID;
   }
 
   public get fullName() {
@@ -51,5 +57,9 @@ export class ShareOwner {
 
   public get cuttingTime() {
     return this._cuttingTime;
+  }
+
+  public get code() {
+    return this._code;
   }
 }
