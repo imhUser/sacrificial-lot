@@ -8,7 +8,6 @@ export class ShareOwner {
   private _cuttingTime?: string;
   private _code?: string;
   private _animalID?: string;
-  private _isNewShareOwner?: boolean;
   private _processDate?: string;
 
   constructor(
@@ -21,7 +20,6 @@ export class ShareOwner {
     cuttingTime?: string,
     code?: string,
     animalID?: string,
-    isNewShareOwner?: boolean,
     processDate?: string
   ) {
     this._fullName = fullName;
@@ -33,7 +31,6 @@ export class ShareOwner {
     this._cuttingTime = cuttingTime;
     this._code = code;
     this._animalID= animalID;
-    this._isNewShareOwner = isNewShareOwner;
     this._processDate = processDate;
   }
 
@@ -67,10 +64,6 @@ export class ShareOwner {
 
   public get code() {
     return this._code;
-  }
-
-  public get isNewShareOwner() {
-    return this._isNewShareOwner;
   }
 
   public get processDate() {
