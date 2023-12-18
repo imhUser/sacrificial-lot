@@ -3,14 +3,15 @@ import CowImage from "../assets/images/cow.png";
 import { ShareOwner } from "../models/shareOwner";
 
 const ShareInfo = () => {
-  const shareOwnerInfo: ShareOwner = useLocation().state;
+  const shareOwnerInfo: ShareOwner = useLocation().state.shareOwner;
+  const isNewShareOwner: boolean = useLocation().state.isNewShareOwner;
+  
   console.log(useLocation());
-  console.log(shareOwnerInfo.fullName);
   return (
     <>
       <div className="container">
         <div className="row">
-          {shareOwnerInfo.isNewShareOwner ? (
+          {isNewShareOwner ? (
             <div className="tesekkur">
               <p className="d-flex justify-content-center">Teşekkürler</p>
               <p className="d-flex justify-content-center">

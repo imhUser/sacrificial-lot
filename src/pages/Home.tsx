@@ -35,7 +35,7 @@ const Home = () => {
   useEffect(() => {
     console.log(deliveryType + " , " + shareCost + " , " + shareQuantity);
 
-    _shareOwnerService.getAllShareOwners().then(result=>{
+    _shareOwnerService.getAllShareOwners().then((result) => {
       if (result.length > 0) {
         setShareOwnerList(result);
         setLoading(false);
@@ -104,14 +104,19 @@ const Home = () => {
         <td>5</td>
       </tr>
     ));
-  }
+  };
 
-  
   const navigate = useNavigate();
   const onFindShareOwner = () => {
-    _shareOwnerService.getShareOwnerByPhone(phone)
+    _shareOwnerService
+      .getShareOwnerByPhone(phone)
       .then((shareOwnerInfo) => {
-        navigate("/shareInfo", { state: shareOwnerInfo });
+        navigate("/shareInfo", {
+          state: {
+            shareOwner: shareOwnerInfo,
+            isNewShareOwner: false,
+          },
+        });
       })
       .catch((e) => {
         console.log("cannot find share owner that have it phone number");

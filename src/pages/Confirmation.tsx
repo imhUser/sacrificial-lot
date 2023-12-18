@@ -24,7 +24,9 @@ const Confirmation = () => {
   const [deliveryType, setDeliveryType] = useState<string>("");
   const [shareCost, setShareCost] = useState<string>("");
   const [shareQuantity, setShareQuantity] = useState<number>(0);
-  const [processDate, setProcessDate] = useState<string>();
+  const [processDate, setProcessDate] = useState<string>(
+    DateHelper.getCurrentDate()
+  );
 
   useEffect(() => {
     if (Object.values(fromHome).every((p) => p !== null && p !== undefined)) {
@@ -46,31 +48,26 @@ const Confirmation = () => {
   };
 
   const onVerifyCode = async () => {
-    setProcessDate(DateHelper.getCurrentDate);
+    const newShareOwner = {
+      fullName: fullName,
+      phone: phone,
+      address: address,
+      shareCost: shareCost,
+      shareQuantity: shareQuantity,
+      deliveryType: deliveryType,
+      code: code,
+      cuttingTime: "9:45",
+      animalID: "1",
+      processDate: processDate,
+    } as ShareOwner;
+
     await _firebaseService
-      .verifyCode(confirmation, code, {
-        fullName: fullName,
-        phone: phone,
-        address: address,
-        shareCost: shareCost,
-        shareQuantity: shareQuantity,
-        deliveryType: deliveryType,
-        code: code,
-        cuttingTime: "9:45",
-        animalID: "1",
-        isNewShareOwner: true,
-        processDate: processDate
-      } as ShareOwner)
+      .verifyCode(confirmation, code, newShareOwner)
       .then((result) => {
-        console.log("share owner saved");
+        console.log("share owner saved, navigating...");
         navigate("/shareInfo", {
           state: {
-            fullName: fullName,
-            phone: phone,
-            address: address,
-            deliveryType: deliveryType,
-            shareCost: shareCost,
-            shareQuantity: shareQuantity,
+            shareOwner: newShareOwner,
             isNewShareOwner: true,
           },
         });
