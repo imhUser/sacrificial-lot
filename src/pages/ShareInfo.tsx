@@ -47,7 +47,7 @@ const ShareInfo = () => {
                     <td>{shareOwnerInfo.cuttingTime}</td>
                     <td>{shareOwnerInfo.shareCost} TL</td>
                     <td>{shareOwnerInfo.phone}</td>
-                    <td>2023-05-06</td>
+                    <td>{shareOwnerInfo.processDate}</td>
                     <td>{shareOwnerInfo.deliveryType}</td>
                     <td>
                       <span
