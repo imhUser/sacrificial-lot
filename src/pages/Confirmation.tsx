@@ -54,7 +54,8 @@ const Confirmation = () => {
         deliveryType: deliveryType,
         code: code,
         cuttingTime: "9:45",
-        animalID: "1"
+        animalID: "1",
+        isNewShareOwner: true
       } as ShareOwner)
       .then((result) => {
         console.log("share owner saved");

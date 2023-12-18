@@ -1,18 +1,9 @@
 import { useLocation } from "react-router-dom";
 import CowImage from "../assets/images/cow.png";
-
-interface Props {
-  fullName: string;
-  address: string;
-  shareQuantity: number;
-  shareCost: string;
-  deliveryType: string;
-  phone: string;
-  isNewShareOwner: boolean;
-}
+import { ShareOwner } from "../models/shareOwner";
 
 const ShareInfo = () => {
-  const shareOwnerInfo: Props = useLocation().state;
+  const shareOwnerInfo: ShareOwner = useLocation().state;
   console.log(useLocation());
   console.log(shareOwnerInfo.fullName);
   return (
@@ -53,7 +44,7 @@ const ShareInfo = () => {
                     <td>{shareOwnerInfo.fullName}</td>
                     <td>123</td>
                     <td>456</td>
-                    <td>10:30</td>
+                    <td>{shareOwnerInfo.cuttingTime}</td>
                     <td>{shareOwnerInfo.shareCost} TL</td>
                     <td>{shareOwnerInfo.phone}</td>
                     <td>2023-05-06</td>
