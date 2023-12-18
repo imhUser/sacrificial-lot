@@ -4,6 +4,7 @@ import { ConfirmationResult } from "firebase/auth";
 import Button from "../components/Button";
 import { FirebaseService } from "../services/firebaseService";
 import { ShareOwner } from "../models/shareOwner";
+import { DateHelper } from "../utilities/dateHelper";
 
 interface Props {
   deliveryType: string;
@@ -23,6 +24,7 @@ const Confirmation = () => {
   const [deliveryType, setDeliveryType] = useState<string>("");
   const [shareCost, setShareCost] = useState<string>("");
   const [shareQuantity, setShareQuantity] = useState<number>(0);
+  const [processDate, setProcessDate] = useState<string>();
 
   useEffect(() => {
     if (Object.values(fromHome).every((p) => p !== null && p !== undefined)) {
@@ -44,6 +46,7 @@ const Confirmation = () => {
   };
 
   const onVerifyCode = async () => {
+    setProcessDate(DateHelper.getCurrentDate);
     await _firebaseService
       .verifyCode(confirmation, code, {
         fullName: fullName,
@@ -55,7 +58,8 @@ const Confirmation = () => {
         code: code,
         cuttingTime: "9:45",
         animalID: "1",
-        isNewShareOwner: true
+        isNewShareOwner: true,
+        processDate: processDate
       } as ShareOwner)
       .then((result) => {
         console.log("share owner saved");
