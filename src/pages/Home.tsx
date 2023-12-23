@@ -31,7 +31,7 @@ const Home = () => {
   const [selectedCuttingTime, setSelectedCuttingTime] = useState<string>("");
 
   const [selectedShareOwnerWithTableItem, setSelectedShareOwnerWithTableItem] =
-    useState<ShareOwner>({} as ShareOwner);
+    useState<ShareOwner>();
   const [checkedBtn, setCheckedBtn] = useState<string>("");
   const onCheckTableItem = (shareOwner: ShareOwner, id: string) => {
     document.getElementById(checkedBtn)?.removeAttribute("checked");
@@ -217,8 +217,8 @@ const Home = () => {
         },
       });
     } else if (
-      selectedCuttingTime != "" &&
       selectedSacrificialAnimal != null &&
+      selectedCuttingTime != "" &&
       deliveryType != null &&
       shareCost != null &&
       shareQuantity != null
@@ -226,8 +226,8 @@ const Home = () => {
       navigate("/confirmation", {
         state: {
           fromHome: {
-            selectedCuttingTime: selectedCuttingTime,
             selectedSacrificialAnimal: selectedSacrificialAnimal,
+            selectedCuttingTime: selectedCuttingTime,
             deliveryType: deliveryType,
             shareCost: shareCost,
             shareQuantity: shareQuantity,
@@ -235,6 +235,7 @@ const Home = () => {
         },
       });
     } else {
+      alert("Lütfen Gerekli Bilgileri Doldurunuz");
     }
   };
 
