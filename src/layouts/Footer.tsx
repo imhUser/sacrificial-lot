@@ -6,6 +6,7 @@ const Footer = () => {
         color: "white",
         textAlign: "center",
         fontSize: "2vh",
+        marginTop: "5vw",
       }}
     >
       Copyright 2023 © Genç Teknik Tüm hakları saklıdır
