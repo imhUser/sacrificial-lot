@@ -7,8 +7,12 @@ import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { ShareOwner } from "../models/shareOwner";
 import { ShareOwnerService } from "../services/shareOwnerService";
+import { SacrificialAnimalService } from "../services/sacrificialAnimalService";
+import { SacrificialAnimal } from "../models/sacrificialAnimal";
 
 const Home = () => {
+  const navigate = useNavigate();
+
   const [deliveryType, setDeliveryType] = useState<string>();
   const [shareCost, setShareCost] = useState<string>();
   const [shareQuantity, setShareQuantity] = useState<number>();
@@ -17,8 +21,36 @@ const Home = () => {
 
   const [loading, setLoading] = useState(true);
   const [shareOwnerList, setShareOwnerList] = useState<ShareOwner[]>([]);
+  const [sacrificialAnimalList, setSacrificialAnimalList] = useState<
+    SacrificialAnimal[]
+  >([]);
+
+  const [selectedSacrificialAnimal, setSelectedSacrificialAnimal] =
+    useState<SacrificialAnimal>();
+  const cuttingTimeList: string[] = ["9:00", "9:15", "9:30", "9:45"];
+  const [selectedCuttingTime, setSelectedCuttingTime] = useState<string>("");
+
+  const [selectedShareOwnerWithTableItem, setSelectedShareOwnerWithTableItem] =
+    useState<ShareOwner>({} as ShareOwner);
+  const [checkedBtn, setCheckedBtn] = useState<string>("");
+  const onCheckTableItem = (shareOwner: ShareOwner, id: string) => {
+    document.getElementById(checkedBtn)?.removeAttribute("checked");
+    setCheckedBtn(id);
+
+    setSelectedShareOwnerWithTableItem(shareOwner);
+    document.getElementById(id)?.setAttribute("checked", "true");
+  };
+
+  const resetData = () => {
+    setSelectedCuttingTime("");
+
+    document.getElementById(checkedBtn)?.removeAttribute("checked");
+    setCheckedBtn("");
+    setSelectedShareOwnerWithTableItem({} as ShareOwner);
+  };
 
   const _shareOwnerService = new ShareOwnerService();
+  const _sacrificialAnimalService = new SacrificialAnimalService();
 
   const onClickDeliveryType = (deliveryType: string) => {
     setDeliveryType(deliveryType);
@@ -39,6 +71,12 @@ const Home = () => {
       if (result.length > 0) {
         setShareOwnerList(result);
         setLoading(false);
+      }
+    });
+
+    _sacrificialAnimalService.getAll().then((result) => {
+      if (result.length > 0) {
+        setSacrificialAnimalList(result);
       }
     });
   }, [deliveryType, shareCost, shareQuantity]);
@@ -97,16 +135,54 @@ const Home = () => {
   // set share owners html table items
   const setShareOwnerTableItems = () => {
     return shareOwnerList.map((item, index) => (
-      <tr key={index}>
+      <tr
+        key={index}
+        onClick={() => onCheckTableItem(item, "selectTableItem " + index)}
+      >
         <td>{item.cuttingTime}</td>
-        <td></td>
         <td>{item.fullName}</td>
         <td>5</td>
+        <td>
+          <input
+            className="form-check-input"
+            type="radio"
+            name="flexRadioDefault"
+            id={"selectTableItem " + index}
+            onClick={() => onCheckTableItem(item, "selectTableItem " + index)}
+          />
+        </td>
       </tr>
     ));
   };
 
-  const navigate = useNavigate();
+  // set sacrificial animals html select box
+  const setSacrificialAnimalTableItems = () => {
+    return sacrificialAnimalList.map((item, index) => (
+      <li key={index}>
+        <a
+          className="dropdown-item"
+          onClick={() => setSelectedSacrificialAnimal(item)}
+        >
+          Dana {item.id}
+        </a>
+      </li>
+    ));
+  };
+
+  // / set sacrificial animal cutting times html select box
+  const setCuttingTimeHTMLItems = () => {
+    return cuttingTimeList.map((item, index) => (
+      <li key={index}>
+        <a
+          className="dropdown-item"
+          onClick={() => setSelectedCuttingTime(item)}
+        >
+          {item}
+        </a>
+      </li>
+    ));
+  };
+
   const onFindShareOwner = () => {
     _shareOwnerService
       .getShareOwnerByPhone(phone)
@@ -121,6 +197,45 @@ const Home = () => {
       .catch((e) => {
         console.log("cannot find share owner that have it phone number");
       });
+  };
+
+  const nextPage = () => {
+    if (
+      selectedShareOwnerWithTableItem != null &&
+      deliveryType != null &&
+      shareCost != null &&
+      shareQuantity != null
+    ) {
+      navigate("/confirmation", {
+        state: {
+          fromHome: {
+            shareOwner: selectedShareOwnerWithTableItem,
+            deliveryType: deliveryType,
+            shareCost: shareCost,
+            shareQuantity: shareQuantity,
+          },
+        },
+      });
+    } else if (
+      selectedCuttingTime != "" &&
+      selectedSacrificialAnimal != null &&
+      deliveryType != null &&
+      shareCost != null &&
+      shareQuantity != null
+    ) {
+      navigate("/confirmation", {
+        state: {
+          fromHome: {
+            selectedCuttingTime: selectedCuttingTime,
+            selectedSacrificialAnimal: selectedSacrificialAnimal,
+            deliveryType: deliveryType,
+            shareCost: shareCost,
+            shareQuantity: shareQuantity,
+          },
+        },
+      });
+    } else {
+    }
   };
 
   return (
@@ -309,99 +424,213 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {/* fourth part */}
+
       <div className="container">
         <div className="row teslimat">
-          {/* Tablo */}
-          <div className="col" style={{ marginTop: "59px" }}>
-            <div className="d-flex">
-              <p className="teslimat-yazi">Saat Seçimi</p>
-              <p
-                style={{
-                  marginLeft: "15px",
-                  display: "flex",
-                  alignItems: "end",
-                  fontSize: "15px",
-                  color: "#8f8f8f",
-                }}
+          <div className="col">
+            <ul className="nav nav-tabs" id="myTab" role="tablist">
+              <li className="nav-item" role="presentation">
+                <button
+                  className="nav-link active"
+                  id="home-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#home-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="home-tab-pane"
+                  aria-selected="true"
+                  onClick={() => resetData()}
+                >
+                  Yeni Hayvan Seç
+                </button>
+              </li>
+              <li className="nav-item" role="presentation">
+                <button
+                  className="nav-link"
+                  id="profile-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#profile-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="profile-tab-pane"
+                  aria-selected="false"
+                  onClick={() => resetData()}
+                >
+                  Var Olan Hisselerden Hisse Seç
+                </button>
+              </li>
+            </ul>
+            <div className="tab-content" id="myTabContent">
+              <div
+                className="tab-pane fade show active"
+                id="home-tab-pane"
+                role="tabpanel"
+                aria-labelledby="home-tab"
+                tabIndex={0}
               >
-                29 Haziran, Perşembe
-              </p>
-            </div>
+                <div className="container">
+                  <div className="row teslimat">
+                    <div className="col" style={{ marginTop: "59px" }}>
+                      <div className="d-flex">
+                        {/* <p className="teslimat-yazi">Saat Seçimi</p> */}
 
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Saat</th>
-                    <th>Hisse No</th>
-                    <th>İlk Hisse Sahibi</th>
-                    <th>Boş Hisse Sayısı</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td>Loading...</td>
-                    </tr>
-                  ) : (
-                    setShareOwnerTableItems()
-                  )}
-                </tbody>
-              </table>
-            </div>
-            <div
-              className="alert alert-primary d-flex align-content-center"
-              role="alert"
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{ marginRight: "13px" }}
+                        <div className="dropdown-center">
+                          <button
+                            className="btn btn-secondary dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            style={{
+                              backgroundColor: "#3ec564",
+                              border: "none",
+                            }}
+                          >
+                            {selectedCuttingTime == ""
+                              ? "Kesim Saati Seçiniz"
+                              : selectedCuttingTime}
+                          </button>
+                          <ul className="dropdown-menu">
+                            {setCuttingTimeHTMLItems()}
+                          </ul>
+                        </div>
+
+                        <div className="dropdown-center">
+                          <button
+                            className="btn btn-secondary dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            style={{
+                              backgroundColor: "#3ec564",
+                              border: "none",
+                            }}
+                          >
+                            {selectedSacrificialAnimal == null
+                              ? "Yeni Kurbanlık Hayvan Seçebilirsiniz"
+                              : "Dana " + selectedSacrificialAnimal.id}
+                          </button>
+                          <ul className="dropdown-menu">
+                            {setSacrificialAnimalTableItems()}
+                          </ul>
+                        </div>
+
+                        <p
+                          style={{
+                            marginLeft: "15px",
+                            display: "flex",
+                            alignItems: "end",
+                            fontSize: "15px",
+                            color: "#8f8f8f",
+                          }}
+                        >
+                          {selectedSacrificialAnimal != null
+                            ? "Seçilen Hayvanın Toplam Fiyatı:" +
+                              selectedSacrificialAnimal?.totalPrice +
+                              "₺" +
+                              "Seçtiğiniz Hayvandan Alınabilir Hisse Fiyatı:" +
+                              selectedSacrificialAnimal?.purchasableShareQuantity
+                            : ""}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="tab-pane fade"
+                id="profile-tab-pane"
+                role="tabpanel"
+                aria-labelledby="profile-tab"
+                tabIndex={0}
               >
-                error
-              </span>
-              <span style={{ fontSize: "12px", lineHeight: "18px" }}>
-                Kurbanlarımız kesildikten sonra parçalanma süresi 2.30 - 3 saati
-                bulabilmektedir.
-              </span>
+                <div className="container">
+                  <div className="row teslimat">
+                    {/* Tablo */}
+                    <div className="col" style={{ marginTop: "59px" }}>
+                      <div className="table-responsive table-container">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>Saat</th>
+                              <th>İlk Hisse Sahibi</th>
+                              <th>Boş Hisse Sayısı</th>
+                              <th>Seç</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {loading ? (
+                              <tr>
+                                <td>Loading...</td>
+                              </tr>
+                            ) : (
+                              setShareOwnerTableItems()
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div
+                        className="alert alert-primary d-flex align-content-center"
+                        role="alert"
+                      >
+                        <span
+                          className="material-symbols-outlined"
+                          style={{ marginRight: "13px" }}
+                        >
+                          error
+                        </span>
+                        <span style={{ fontSize: "12px", lineHeight: "18px" }}>
+                          Kurbanlarımız kesildikten sonra parçalanma süresi 2.30
+                          - 3 saati bulabilmektedir.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="row teslimat">
-          {/* Hisse Seçim */}
-          <div className="col" style={{ marginTop: "59px" }}>
-            <div className="teslimat-türü">
-              <p className="teslimat-yazi">Teslimat Türü</p>
-              <div id="button-group1" className="button-teslimat-turu d-flex">
-                <Button
-                  buttonTitle="Kesimhanede Teslim"
-                  style={{ margin: "0px" }}
-                  additionalStyles={["btn-secondary", "hisse-teslim"]}
-                  onClick={onClickDeliveryType}
-                ></Button>
-                <Button
-                  buttonTitle="Toplu Teslim"
-                  style={{ marginLeft: "12px" }}
-                  additionalStyles={["btn-secondary", "hisse-teslim"]}
-                  onClick={onClickDeliveryType}
-                ></Button>
+      </div>
+
+      {(selectedCuttingTime != "" && selectedSacrificialAnimal != null) ||
+      checkedBtn != "" ? (
+        <div className="container">
+          <div className="row teslimat">
+            {/* Hisse Seçim */}
+            <div className="col" style={{ marginTop: "59px" }}>
+              <div className="teslimat-türü">
+                <p className="teslimat-yazi">Teslimat Türü</p>
+                <div id="button-group1" className="button-teslimat-turu d-flex">
+                  <Button
+                    buttonTitle="Kesimhanede Teslim"
+                    style={{ margin: "0px" }}
+                    additionalStyles={["btn-secondary", "hisse-teslim"]}
+                    onClick={onClickDeliveryType}
+                  ></Button>
+                  <Button
+                    buttonTitle="Toplu Teslim"
+                    style={{ marginLeft: "12px" }}
+                    additionalStyles={["btn-secondary", "hisse-teslim"]}
+                    onClick={onClickDeliveryType}
+                  ></Button>
+                </div>
               </div>
-            </div>
-            <div className="hisse-tutarı" style={{ marginTop: "36px" }}>
-              <p className="teslimat-yazi">Hisse Tutarı</p>
-              <div className="container">
-                <div className="row">
-                  <div
-                    id="button-group2"
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      padding: "0px",
-                      width: "88%",
-                    }}
-                  >
-                    <div style={{ display: "flex" }}>{shareCostButtons}</div>
-                    {/* <div
+              <div className="hisse-tutarı" style={{ marginTop: "36px" }}>
+                <p className="teslimat-yazi">Hisse Tutarı</p>
+                <div className="container">
+                  <div className="row">
+                    <div
+                      id="button-group2"
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        padding: "0px",
+                        width: "88%",
+                      }}
+                    >
+                      <div style={{ display: "flex" }}>{shareCostButtons}</div>
+                      {/* <div
                       style={{
                         display: "flex",
                         marginTop: "15px",
@@ -433,46 +662,34 @@ const Home = () => {
                         13500<span>₺</span>
                       </button>
                     </div> */}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="hisse-adedi" style={{ marginTop: "36px" }}>
-              <p className="teslimat-yazi">Hisse Adedi</p>
-              <div
-                id="button-group3"
-                className="d-flex"
-                style={{ width: "80%" }}
-              >
-                {shareQuantityButtons}
+              <div className="hisse-adedi" style={{ marginTop: "36px" }}>
+                <p className="teslimat-yazi">Hisse Adedi</p>
+                <div
+                  id="button-group3"
+                  className="d-flex"
+                  style={{ width: "80%" }}
+                >
+                  {shareQuantityButtons}
+                </div>
               </div>
-            </div>
-            <Link
-              style={{ textDecoration: "none" }}
-              to="/confirmation"
-              state={{
-                fromHome: {
-                  deliveryType: deliveryType,
-                  shareCost: shareCost,
-                  shareQuantity: shareQuantity,
-                },
-              }}
-            >
-              <button
-                className="sonraki-adım"
-                onClick={() => console.log("next page")}
-              >
+              <button className="sonraki-adım" onClick={() => nextPage()}>
                 Sonraki Adım
                 <span className="material-symbols-outlined">
                   {" "}
                   chevron_right{" "}
                 </span>
               </button>
-            </Link>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        ""
+      )}
     </>
   );
 };
