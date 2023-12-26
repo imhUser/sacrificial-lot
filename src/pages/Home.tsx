@@ -258,9 +258,9 @@ const Home = () => {
                 gerçekleştirelim!
               </span>
             </div>
-            <button type="button" className="btn btn-success">
+            {/* <button type="button" className="btn btn-success">
               Hemen Başlayalım!
-            </button>
+            </button> */}
           </div>
           <div className="col-lg-6 col-sm-12">
             <div
@@ -447,7 +447,7 @@ const Home = () => {
                   aria-selected="true"
                   onClick={() => {resetData(); displayNone();}}
                 >
-                  Yeni Hayvan Seç
+                  Hayvan Seç
                 </button>
               </li>
               <li className="nav-item" role="presentation">
@@ -466,7 +466,7 @@ const Home = () => {
                   }}
                   style={{ display: "none" }}
                 >
-                  Var Olan Hisselerden Hisse Seç
+                  Hisselerden Seç
                 </button>
               </li>
             </ul>
