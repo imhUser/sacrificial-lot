@@ -28,6 +28,14 @@ body {
   .cowImage {
     width: 80vw;
   }
+
+  .selectableInfos{
+    width: 100% !important;
+  }
+
+  .teslimat-yazi {
+    width: 100% !important;
+  }
 }
 
 .logo {

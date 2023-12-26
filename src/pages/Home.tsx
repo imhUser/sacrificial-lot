@@ -635,7 +635,7 @@ const Home = () => {
                   ></Button> */}
 
                   <button
-                    className="btn btn-secondary dropdown-toggle"
+                    className="btn btn-secondary dropdown-toggle selectableInfos"
                     type="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
@@ -678,13 +678,12 @@ const Home = () => {
                       style={{
                         display: "flex",
                         flexDirection: "column",
-                        padding: "0px",
-                        width: "88%",
+                        padding: "0px"
                       }}
                     >
                       {/* <div style={{ display: "flex" }}>{shareCostButtons}</div> */}
                       <button
-                        className="btn btn-secondary dropdown-toggle"
+                        className="btn btn-secondary dropdown-toggle selectableInfos"
                         type="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
@@ -737,7 +736,7 @@ const Home = () => {
               <div className="hisse-adedi" style={{ marginTop: "36px" }}>
                 <p className="teslimat-yazi">Hisse Adedi</p>
                 <button
-                  className="btn btn-secondary dropdown-toggle"
+                  className="btn btn-secondary dropdown-toggle selectableInfos"
                   type="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
