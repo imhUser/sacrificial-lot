@@ -47,11 +47,6 @@ const Home = () => {
     document.getElementById(checkedBtn)?.removeAttribute("checked");
     setCheckedBtn("");
     setSelectedShareOwnerWithTableItem({} as ShareOwner);
-
-    let shareOwnerTabBody = document.getElementById("profile-tab-pane");
-    if (shareOwnerTabBody != null) {
-      shareOwnerTabBody.style.display = "none";
-    }
   };
 
   const _shareOwnerService = new ShareOwnerService();
@@ -69,19 +64,27 @@ const Home = () => {
     setShareQuantity(parseInt(shareQuantity));
   };
 
+  const displayBlock = () => {
+    let shareOwnerTabBody = document.getElementById("profile-tab-pane");
+    if (shareOwnerTabBody != null) {
+      shareOwnerTabBody.style.display = "block";
+    }
+  };
+
+  const displayNone = () => {
+    let shareOwnerTabBody = document.getElementById("profile-tab-pane");
+    if (shareOwnerTabBody != null) {
+      shareOwnerTabBody.style.display = "none";
+    }
+  };
   useEffect(() => {
     console.log(deliveryType + " , " + shareCost + " , " + shareQuantity);
 
     _shareOwnerService.getAllShareOwners().then((result) => {
       if (result.length > 0) {
         let shareOwnerTabHeader = document.getElementById("profile-tab");
-        let shareOwnerTabBody = document.getElementById("profile-tab-pane");
         if (shareOwnerTabHeader != null) {
           shareOwnerTabHeader.style.display = "block";
-        }
-
-        if (shareOwnerTabBody != null) {
-          shareOwnerTabBody.style.display = "block";
         }
 
         setShareOwnerList(result);
@@ -98,52 +101,40 @@ const Home = () => {
   // set share quantity html buttons
   const shareQuantityButtons = [];
   for (let index = 1; index <= 7; index++) {
-    index == 1
-      ? shareQuantityButtons.push(
-          <Button
-            key={index}
-            buttonTitle={index.toString()}
-            style={{ flex: "1", margin: "0px" }}
-            additionalStyles={["btn-secondary", "hisse-adet"]}
-            onClick={onClickShareQuantity}
-          ></Button>
-        )
-      : shareQuantityButtons.push(
-          <Button
-            key={index}
-            buttonTitle={index.toString()}
-            style={{ flex: "1" }}
-            additionalStyles={["btn-secondary", "hisse-adet"]}
-            onClick={onClickShareQuantity}
-          ></Button>
-        );
+    shareQuantityButtons.push(
+      <li key={index}>
+        <a
+          className="dropdown-item"
+          onClick={() => onClickShareQuantity(index.toString())}
+        >
+          {index}
+        </a>
+      </li>
+    );
   }
 
   // set share cost html buttons
   const shareCostButtons = [];
   const shareCosts = ["8500", "9250", "1000", "10750", "11500"];
   for (let index = 0; index < shareCosts.length; index++) {
-    index == 0
-      ? shareCostButtons.push(
-          <Button
-            key={index}
-            buttonTitle={shareCosts[index]}
-            style={{ flex: "1", marginLeft: "0px" }}
-            additionalStyles={["btn-secondary", "hisse-fiyat"]}
-            additionalTextAsHtml={<span>₺</span>}
-            onClick={onClickShareCost}
-          ></Button>
-        )
-      : shareCostButtons.push(
-          <Button
-            key={index}
-            buttonTitle={shareCosts[index]}
-            style={{ flex: "1", marginLeft: "20px" }}
-            additionalStyles={["btn-secondary", "hisse-fiyat"]}
-            additionalTextAsHtml={<span>₺</span>}
-            onClick={onClickShareCost}
-          ></Button>
-        );
+    shareCostButtons.push(
+      // <Button
+      //   key={index}
+      //   buttonTitle={shareCosts[index]}
+      //   style={{ flex: "1", marginLeft: "20px" }}
+      //   additionalStyles={["btn-secondary", "hisse-fiyat"]}
+      //   additionalTextAsHtml={<span>₺</span>}
+      //   onClick={onClickShareCost}
+      // ></Button>
+      <li key={index}>
+        <a
+          className="dropdown-item"
+          onClick={() => onClickShareCost(shareCosts[index])}
+        >
+          {shareCosts[index]} <span>₺</span>
+        </a>
+      </li>
+    );
   }
 
   // set share owners html table items
@@ -276,7 +267,7 @@ const Home = () => {
               className="text-white mx-auto d-block"
               style={{ width: "100%" }}
             >
-              <img src={CowImage} alt="" />
+              <img src={CowImage} alt="" className="cowImage" />
             </div>
           </div>
         </div>
@@ -454,7 +445,7 @@ const Home = () => {
                   role="tab"
                   aria-controls="home-tab-pane"
                   aria-selected="true"
-                  onClick={() => resetData()}
+                  onClick={() => {resetData(); displayNone();}}
                 >
                   Yeni Hayvan Seç
                 </button>
@@ -469,7 +460,10 @@ const Home = () => {
                   role="tab"
                   aria-controls="profile-tab-pane"
                   aria-selected="false"
-                  onClick={() => resetData()}
+                  onClick={() => {
+                    resetData();
+                    displayBlock();
+                  }}
                   style={{ display: "none" }}
                 >
                   Var Olan Hisselerden Hisse Seç
@@ -506,7 +500,7 @@ const Home = () => {
                           }}
                         >
                           {selectedCuttingTime == ""
-                            ? "Kesim Saati Seçiniz"
+                            ? "Seçiniz"
                             : selectedCuttingTime}
                         </button>
                         <ul className="dropdown-menu">
@@ -530,7 +524,7 @@ const Home = () => {
                           }}
                         >
                           {selectedSacrificialAnimal == null
-                            ? "Yeni Kurbanlık Hayvan Seçebilirsiniz"
+                            ? "Seçiniz"
                             : "Dana " + selectedSacrificialAnimal.id}
                         </button>
                         <ul className="dropdown-menu">
@@ -627,7 +621,7 @@ const Home = () => {
               <div className="teslimat-türü">
                 <p className="teslimat-yazi">Teslimat Türü</p>
                 <div id="button-group1" className="button-teslimat-turu d-flex">
-                  <Button
+                  {/* <Button
                     buttonTitle="Kesimhanede Teslim"
                     style={{ margin: "0px" }}
                     additionalStyles={["btn-secondary", "hisse-teslim"]}
@@ -638,7 +632,41 @@ const Home = () => {
                     style={{ marginLeft: "12px" }}
                     additionalStyles={["btn-secondary", "hisse-teslim"]}
                     onClick={onClickDeliveryType}
-                  ></Button>
+                  ></Button> */}
+
+                  <button
+                    className="btn btn-secondary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    style={{
+                      backgroundColor: "grey",
+                      border: "none",
+                      width: "12vw",
+                    }}
+                  >
+                    {deliveryType == null ? "Seçiniz" : deliveryType}
+                  </button>
+                  <ul className="dropdown-menu">
+                    <li>
+                      <a
+                        className="dropdown-item"
+                        onClick={() =>
+                          onClickDeliveryType("Kesimhanede Teslim")
+                        }
+                      >
+                        Kesimhanede Teslim
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="dropdown-item"
+                        onClick={() => onClickDeliveryType("Toplu Teslim")}
+                      >
+                        Toplu Teslim
+                      </a>
+                    </li>
+                  </ul>
                 </div>
               </div>
               <div className="hisse-tutarı" style={{ marginTop: "36px" }}>
@@ -654,7 +682,21 @@ const Home = () => {
                         width: "88%",
                       }}
                     >
-                      <div style={{ display: "flex" }}>{shareCostButtons}</div>
+                      {/* <div style={{ display: "flex" }}>{shareCostButtons}</div> */}
+                      <button
+                        className="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        style={{
+                          backgroundColor: "grey",
+                          border: "none",
+                          width: "10vw",
+                        }}
+                      >
+                        {shareCost == null ? "Seçiniz" : shareCost}
+                      </button>
+                      <ul className="dropdown-menu">{shareCostButtons}</ul>
                       {/* <div
                       style={{
                         display: "flex",
@@ -694,15 +736,26 @@ const Home = () => {
 
               <div className="hisse-adedi" style={{ marginTop: "36px" }}>
                 <p className="teslimat-yazi">Hisse Adedi</p>
-                <div
-                  id="button-group3"
-                  className="d-flex"
-                  style={{ width: "80%" }}
+                <button
+                  className="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  style={{
+                    backgroundColor: "grey",
+                    border: "none",
+                    width: "10vw",
+                  }}
                 >
-                  {shareQuantityButtons}
-                </div>
+                  {shareQuantity == null ? "Seçiniz" : shareQuantity}
+                </button>
+                <ul className="dropdown-menu">{shareQuantityButtons}</ul>
               </div>
-              <button className="sonraki-adım" onClick={() => nextPage()}>
+              <button
+                className="sonraki-adım"
+                onClick={() => nextPage()}
+                style={{ marginTop: "15px" }}
+              >
                 Sonraki Adım
                 <span className="material-symbols-outlined">
                   {" "}
