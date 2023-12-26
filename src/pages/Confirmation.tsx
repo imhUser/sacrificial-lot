@@ -6,6 +6,7 @@ import { FirebaseService } from "../services/firebaseService";
 import { ShareOwner } from "../models/shareOwner";
 import { DateHelper } from "../utilities/dateHelper";
 import { SacrificialAnimal } from "../models/sacrificialAnimal";
+import { ShareOwnerService } from "../services/shareOwnerService";
 
 interface Props {
   shareOwner?: ShareOwner;
@@ -21,6 +22,7 @@ const Confirmation = () => {
   const navigate = useNavigate();
   const fromHome: Props = location.state.fromHome;
   const _firebaseService = new FirebaseService();
+  const _shareOwnerService = new ShareOwnerService();
 
   const [fullName, setFullName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
@@ -35,6 +37,8 @@ const Confirmation = () => {
   const [willBeAssociate, setWillBeAssociate] = useState<ShareOwner>(
     {} as ShareOwner
   );
+
+  const [saveShareOwnerList, setSaveShareOwnerList] = useState<ShareOwner[]>([]);
 
   const [selectedSacrificialAnimal, setSelectedSacrificialAnimal] =
     useState<SacrificialAnimal>({} as SacrificialAnimal);
@@ -55,8 +59,12 @@ const Confirmation = () => {
         setSelectedSacrificialAnimal(fromHome.selectedSacrificialAnimal);
         setSelectedCuttingTime(fromHome.selectedCuttingTime);
       }
+
+      for (let index = 0; index < shareQuantity; index++) {
+        setSaveShareOwnerList(oldArray => [...oldArray, {} as ShareOwner]);
+      }
     }
-  });
+  },[]);
 
   const [code, setCode] = useState("");
   const [confirmation, setConfirmation] = useState<ConfirmationResult>();
@@ -83,7 +91,7 @@ const Confirmation = () => {
       processDate: processDate,
     } as ShareOwner;
 
-    await _firebaseService
+    await _shareOwnerService
       .verifyCode(confirmation, code, newShareOwner)
       .then((result) => {
         console.log("share owner saved, navigating...");
@@ -101,19 +109,36 @@ const Confirmation = () => {
 
   // logic to control of check contact info input check
   const [isChecked, setIsChecked] = useState<boolean>(false);
-  const disableInputs = (notDisplayNoneIndex: number) => {
+  const [isOneShare, setIsOneShare] = useState<boolean>(false);
+  const disableInputsWithCSSStyle = (displayTrueIndex: number) => {
     if (!isChecked) {
       for (let index = 1; index <= shareQuantity; index++) {
-        const el = document.getElementById("is-share-contact-" + index);
-        if (el != null && index != notDisplayNoneIndex) {
+        const el = document.getElementById("check-info-input-" + index);
+        if (el != null && index != displayTrueIndex) {
           el.style.display = "none";
+        }
+
+        const elShareQuantityTabHeaderItem = document.getElementById(
+          "share-quantity-tab-header-" + index
+        );
+        if (elShareQuantityTabHeaderItem != null && index != displayTrueIndex) {
+          elShareQuantityTabHeaderItem.style.display = "none";
+          setIsOneShare(true);
         }
       }
     } else {
       for (let index = 1; index <= shareQuantity; index++) {
-        const el = document.getElementById("is-share-contact-" + index);
-        if (el != null && index != notDisplayNoneIndex) {
+        const el = document.getElementById("check-info-input-" + index);
+        if (el != null && index != displayTrueIndex) {
           el.style.display = "block";
+        }
+
+        const elShareQuantityTabHeaderItem = document.getElementById(
+          "share-quantity-tab-header-" + index
+        );
+        if (elShareQuantityTabHeaderItem != null && index != displayTrueIndex) {
+          elShareQuantityTabHeaderItem.style.display = "block";
+          setIsOneShare(false);
         }
       }
     }
@@ -124,7 +149,12 @@ const Confirmation = () => {
   const shareHTMLTabHeaderItems = [];
   for (let index = 1; index <= shareQuantity; index++) {
     shareHTMLTabHeaderItems.push(
-      <li className="nav-item" role="presentation" key={index}>
+      <li
+        className="nav-item"
+        role="presentation"
+        key={index}
+        id={"share-quantity-tab-header-" + index}
+      >
         <button
           className={index == 1 ? "nav-link active" : "nav-link"}
           id={"home-tab-" + (index - 1)}
@@ -136,11 +166,39 @@ const Confirmation = () => {
           aria-selected="true"
           onClick={() => console.log("asd")}
         >
-          {index}. Hisse
+          {isOneShare ? "Hisse" : index + ". Hisse"}
         </button>
       </li>
     );
   }
+
+  const setShareInfo = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: string,
+    saveShareOwnerIndex: number
+  ) => {
+    console.log(saveShareOwnerList.length)
+
+    const name1 = {firstname: "x", lastName:"y", age: 27}
+    let name2 = {...name1}
+    name2 = {...name1, lastName: name1.lastName.toUpperCase()}
+
+    
+    switch (field) {
+      case "fullName":
+        console.log("dsa")
+        break;
+      case "phone":
+        setPhone(e.target.value);
+        break;
+      case "address":
+        setAddress(e.target.value);
+        break;
+
+      default:
+        break;
+    }
+  };
 
   // set share html tabs body
   const shareHTMLTabBodyItems = [];
@@ -156,7 +214,6 @@ const Confirmation = () => {
         tabIndex={index - 1}
         key={index}
       >
-        {index + "adsssssssssssssssss"}
         <div
           className="hisse-button d-flex align-content-center"
           id="shareAmountList"
@@ -173,7 +230,7 @@ const Confirmation = () => {
                   className="form-control inputlar"
                   id="personName"
                   placeholder="Ad Soyad Giriniz"
-                  onChange={(e) => setFullName(e.target.value)}
+                  onChange={(e) => setShareInfo(e, "fullName", index-1)}
                 />
               </div>
             </div>
@@ -188,7 +245,7 @@ const Confirmation = () => {
                   id="tel"
                   maxLength={13}
                   placeholder="555 555 55 55"
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setShareInfo(e, "phone", index-1)}
                 />
               </div>
             </div>
@@ -203,15 +260,15 @@ const Confirmation = () => {
                 className="form-control inputlar"
                 id="address"
                 placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, eros vel bibendum lacinia, justo nunc tempor sapien, at viverra sapien ex ut nisi."
-                onChange={(e) => setAddress(e.target.value)}
+                onChange={(e) => setShareInfo(e, "address", index-1)}
               />
             </div>
-            <div className="form-check" id={"is-share-contact-" + index}>
+            <div className="form-check" id={"check-info-input-" + index}>
               <input
                 className="form-check-input"
                 type="checkbox"
                 id={"kayitCheckbox-" + index}
-                onClick={() => disableInputs(index)}
+                onClick={() => disableInputsWithCSSStyle(index)}
               />
               <label
                 className="form-check-label small"

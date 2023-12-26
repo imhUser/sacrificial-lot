@@ -47,6 +47,11 @@ const Home = () => {
     document.getElementById(checkedBtn)?.removeAttribute("checked");
     setCheckedBtn("");
     setSelectedShareOwnerWithTableItem({} as ShareOwner);
+
+    let shareOwnerTabBody = document.getElementById("profile-tab-pane");
+    if (shareOwnerTabBody != null) {
+      shareOwnerTabBody.style.display = "none";
+    }
   };
 
   const _shareOwnerService = new ShareOwnerService();
@@ -69,8 +74,17 @@ const Home = () => {
 
     _shareOwnerService.getAllShareOwners().then((result) => {
       if (result.length > 0) {
+        let shareOwnerTabHeader = document.getElementById("profile-tab");
+        let shareOwnerTabBody = document.getElementById("profile-tab-pane");
+        if (shareOwnerTabHeader != null) {
+          shareOwnerTabHeader.style.display = "block";
+        }
+
+        if (shareOwnerTabBody != null) {
+          shareOwnerTabBody.style.display = "block";
+        }
+
         setShareOwnerList(result);
-        setLoading(false);
       }
     });
 
@@ -456,6 +470,7 @@ const Home = () => {
                   aria-controls="profile-tab-pane"
                   aria-selected="false"
                   onClick={() => resetData()}
+                  style={{ display: "none" }}
                 >
                   Var Olan Hisselerden Hisse Seç
                 </button>
@@ -471,68 +486,73 @@ const Home = () => {
               >
                 <div className="container">
                   <div className="row teslimat">
-                    <div className="col" style={{ marginTop: "59px" }}>
-                      <div className="d-flex">
-                        {/* <p className="teslimat-yazi">Saat Seçimi</p> */}
-
-                        <div className="dropdown-center">
-                          <button
-                            className="btn btn-secondary dropdown-toggle"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                            style={{
-                              backgroundColor: "#3ec564",
-                              border: "none",
-                            }}
-                          >
-                            {selectedCuttingTime == ""
-                              ? "Kesim Saati Seçiniz"
-                              : selectedCuttingTime}
-                          </button>
-                          <ul className="dropdown-menu">
-                            {setCuttingTimeHTMLItems()}
-                          </ul>
-                        </div>
-
-                        <div className="dropdown-center">
-                          <button
-                            className="btn btn-secondary dropdown-toggle"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                            style={{
-                              backgroundColor: "#3ec564",
-                              border: "none",
-                            }}
-                          >
-                            {selectedSacrificialAnimal == null
-                              ? "Yeni Kurbanlık Hayvan Seçebilirsiniz"
-                              : "Dana " + selectedSacrificialAnimal.id}
-                          </button>
-                          <ul className="dropdown-menu">
-                            {setSacrificialAnimalTableItems()}
-                          </ul>
-                        </div>
-
-                        <p
+                    <div
+                      className="col"
+                      style={{ marginTop: "2vw", textAlign: "center" }}
+                    >
+                      <div
+                        className="dropdown-center"
+                        style={{ marginBottom: "2vw" }}
+                      >
+                        <label>Kesim Saati: </label> &nbsp; &nbsp;
+                        <button
+                          className="btn btn-secondary dropdown-toggle"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
                           style={{
-                            marginLeft: "15px",
-                            display: "flex",
-                            alignItems: "end",
-                            fontSize: "15px",
-                            color: "#8f8f8f",
+                            backgroundColor: "#3ec564",
+                            border: "none",
                           }}
                         >
-                          {selectedSacrificialAnimal != null
-                            ? "Seçilen Hayvanın Toplam Fiyatı:" +
-                              selectedSacrificialAnimal?.totalPrice +
-                              "₺" +
-                              "Seçtiğiniz Hayvandan Alınabilir Hisse Fiyatı:" +
-                              selectedSacrificialAnimal?.purchasableShareQuantity
-                            : ""}
-                        </p>
+                          {selectedCuttingTime == ""
+                            ? "Kesim Saati Seçiniz"
+                            : selectedCuttingTime}
+                        </button>
+                        <ul className="dropdown-menu">
+                          {setCuttingTimeHTMLItems()}
+                        </ul>
                       </div>
+
+                      <div
+                        className="dropdown-center"
+                        style={{ marginBottom: "2vw" }}
+                      >
+                        <label>Hayvan Seçiniz: </label> &nbsp; &nbsp;
+                        <button
+                          className="btn btn-secondary dropdown-toggle"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                          style={{
+                            backgroundColor: "#3ec564",
+                            border: "none",
+                          }}
+                        >
+                          {selectedSacrificialAnimal == null
+                            ? "Yeni Kurbanlık Hayvan Seçebilirsiniz"
+                            : "Dana " + selectedSacrificialAnimal.id}
+                        </button>
+                        <ul className="dropdown-menu">
+                          {setSacrificialAnimalTableItems()}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row teslimat">
+                    <div className="col" style={{ textAlign: "center" }}>
+                      {selectedSacrificialAnimal != null ? (
+                        <>
+                          {"Seçilen Hayvanın Toplam Fiyatı:" +
+                            selectedSacrificialAnimal?.totalPrice +
+                            "₺"}
+                          <br></br>
+                          {"Seçtiğiniz Hayvandan Alınabilir Hisse Fiyatı:" +
+                            selectedSacrificialAnimal?.purchasableShareQuantity}
+                        </>
+                      ) : (
+                        ""
+                      )}
                     </div>
                   </div>
                 </div>
@@ -543,10 +563,22 @@ const Home = () => {
                 role="tabpanel"
                 aria-labelledby="profile-tab"
                 tabIndex={0}
+                style={{ display: "none" }}
               >
                 <div className="container">
                   <div className="row teslimat">
-                    {/* Tablo */}
+                    {/* {loading ? (
+                      <div className="text-center" style={{ marginTop: "3vw" }}>
+                        <span className="sr-only">Bilgiler Getiriliyor</span>
+                        <div
+                          className="spinner-border text-success"
+                          role="status"
+                        ></div>
+                      </div>
+                    ) : (
+                      
+                    )} */}
+
                     <div className="col" style={{ marginTop: "59px" }}>
                       <div className="table-responsive table-container">
                         <table>
@@ -558,15 +590,7 @@ const Home = () => {
                               <th>Seç</th>
                             </tr>
                           </thead>
-                          <tbody>
-                            {loading ? (
-                              <tr>
-                                <td>Loading...</td>
-                              </tr>
-                            ) : (
-                              setShareOwnerTableItems()
-                            )}
-                          </tbody>
+                          <tbody>{setShareOwnerTableItems()}</tbody>
                         </table>
                       </div>
 

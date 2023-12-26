@@ -1,6 +1,7 @@
 import { FirebaseService } from "./firebaseService";
 import { getDocs, query, where, addDoc } from "firebase/firestore";
 import { ShareOwner } from "../models/shareOwner";
+import { ConfirmationResult } from "firebase/auth";
 
 export class ShareOwnerService {
   private static _firebaseService = new FirebaseService();
@@ -35,5 +36,22 @@ export class ShareOwnerService {
 
   async addShareOwner(shareOwner: ShareOwner) {
     return await addDoc(ShareOwnerService._shareOwnerCollectionRef, shareOwner);
+  }
+
+  async verifyCode(
+    confirmation?: ConfirmationResult,
+    code: string = "",
+    shareOwner: ShareOwner = {} as ShareOwner
+  ) {
+    await confirmation
+      ?.confirm(code)
+      .then((result) => {
+        console.log("code verified");
+        return this.addShareOwner(shareOwner);
+      })
+      .catch((error) => {
+        // User couldn't sign in (bad verification code?)
+        console.error("code not verified");
+      });
   }
 }
