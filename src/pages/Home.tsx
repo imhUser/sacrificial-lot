@@ -29,8 +29,10 @@ const Home = () => {
 
   const [selectedSacrificialAnimal, setSelectedSacrificialAnimal] =
     useState<SacrificialAnimal>();
-  
-  const [availableCuttingTimes, setAvailableCuttingTimes] = useState<CuttingTime[]>([]);
+
+  const [availableCuttingTimes, setAvailableCuttingTimes] = useState<
+    CuttingTime[]
+  >([]);
   const [selectedCuttingTime, setSelectedCuttingTime] = useState<string>("");
 
   const [selectedShareOwnerWithTableItem, setSelectedShareOwnerWithTableItem] =
@@ -44,14 +46,12 @@ const Home = () => {
     document.getElementById(id)?.setAttribute("checked", "true");
 
     if (shareOwner.animalID) {
-      _sacrificialAnimalService
-        .getById(shareOwner.animalID)
-        .then((result) => {
-          if (result.purchasableShareQuantity) {
-            setShareQuantityForLoop(parseInt(result.purchasableShareQuantity));
-            setShareQuantityButtons();
-          }
-        });
+      _sacrificialAnimalService.getById(shareOwner.animalID).then((result) => {
+        if (result.purchasableShareQuantity) {
+          setShareQuantityForLoop(parseInt(result.purchasableShareQuantity));
+          setShareQuantityButtons();
+        }
+      });
     }
   };
 
@@ -96,8 +96,7 @@ const Home = () => {
   const [shareQuantityForLoop, setShareQuantityForLoop] = useState<number>(0);
 
   useEffect(() => {
-    console.log(deliveryType + " , " + shareCost + " , " + shareQuantity);
-
+    console.log("sad");
     _shareOwnerService.getAllShareOwners().then((result) => {
       if (result.length > 0) {
         let shareOwnerTabHeader = document.getElementById("profile-tab");
@@ -119,11 +118,11 @@ const Home = () => {
       if (result.length > 0) {
         setAvailableCuttingTimes(result);
       }
-    })
-  }, [deliveryType, shareCost, shareQuantity]);
+    });
+  }, []);
 
   // set share quantity html buttons
-  const shareQuantityButtons = [<a style={{display:"none"}}></a>];
+  const shareQuantityButtons = [<a style={{ display: "none" }}></a>];
   const setShareQuantityButtons = () => {
     for (let index = 1; index <= shareQuantityForLoop; index++) {
       shareQuantityButtons.push(
@@ -164,6 +163,21 @@ const Home = () => {
     );
   }
 
+  const getAvailableAnimalQuantity = (animalID: number) => {
+    _sacrificialAnimalService.getById(animalID).then((result) => {
+      return result.purchasableShareQuantity;
+    });
+    return 0;
+  };
+
+  // const setUnSelectable = (index: string) => {
+  //   const el = document.getElementById(index);
+  //   if (el) {
+  //     el.style.display = "none"
+  //   }
+  //   return ""
+  // };
+
   // set share owners html table items
   const setShareOwnerTableItems = () => {
     return shareOwnerList.map((item, index) => (
@@ -173,7 +187,9 @@ const Home = () => {
       >
         <td>{item.cuttingTime}</td>
         <td>{item.fullName}</td>
-        <td>5</td>
+        <td>
+          {5}
+        </td>
         <td>
           <input
             className="form-check-input"

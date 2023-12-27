@@ -2,12 +2,12 @@ import { useLocation, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ConfirmationResult } from "firebase/auth";
 import Button from "../components/Button";
-import { FirebaseService } from "../services/firebaseService";
 import { ShareOwner } from "../models/shareOwner";
 import { DateHelper } from "../utilities/dateHelper";
 import { SacrificialAnimal } from "../models/sacrificialAnimal";
 import { ShareOwnerService } from "../services/shareOwnerService";
 import { CuttingTimeService } from "../services/cuttingTimeService";
+import { SacrificialAnimalService } from "../services/sacrificialAnimalService";
 
 interface Props {
   shareOwner?: ShareOwner;
@@ -22,9 +22,9 @@ const Confirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const fromHome: Props = location.state.fromHome;
-  const _firebaseService = new FirebaseService();
   const _shareOwnerService = new ShareOwnerService();
   const _cuttingTimeService = new CuttingTimeService();
+  const _sacrificialAnimalService = new SacrificialAnimalService();
 
   const [fullName, setFullName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
@@ -38,10 +38,6 @@ const Confirmation = () => {
 
   const [willBeAssociate, setWillBeAssociate] = useState<ShareOwner>(
     {} as ShareOwner
-  );
-
-  const [saveShareOwnerList, setSaveShareOwnerList] = useState<ShareOwner[]>(
-    []
   );
 
   const [selectedSacrificialAnimal, setSelectedSacrificialAnimal] =
@@ -65,10 +61,6 @@ const Confirmation = () => {
           setSelectedCuttingTime(fromHome.selectedCuttingTime);
         }
       }
-
-      for (let index = 0; index < shareQuantity; index++) {
-        setSaveShareOwnerList((oldArray) => [...oldArray, {} as ShareOwner]);
-      }
     }
   }, []);
 
@@ -83,7 +75,7 @@ const Confirmation = () => {
   //   );
   // };
 
-  const onVerifyCode = async () => {
+  const saveShareOwner = async () => {
     if (fullName != "" && address != "" && phone != "") {
       const newShareOwner = {
         fullName: fullName,
@@ -101,29 +93,38 @@ const Confirmation = () => {
         deposit: false,
         fee: false,
       } as ShareOwner;
-      
-      await _cuttingTimeService
-        .setSelected(selectedCuttingTime)
+
+      _shareOwnerService
+        .addShareOwner(newShareOwner)
         .then((result) => {
-          _shareOwnerService
-            .addShareOwner(newShareOwner)
+          _cuttingTimeService
+            .setSelected(selectedCuttingTime)
             .then((result) => {
-              console.log("share owner saved, navigating...");
-              navigate("/shareInfo", {
-                state: {
-                  shareOwner: newShareOwner,
-                  isNewShareOwner: true,
-                },
-              });
-            })
-            .catch((error) => {
-              console.log("share owner not saved");
+              _sacrificialAnimalService
+                .setSelected(selectedSacrificialAnimal.id, shareQuantity)
+                .then((result) => {
+                  console.log("share owner saved, navigating...");
+                  navigate("/shareInfo", {
+                    state: {
+                      shareOwner: newShareOwner,
+                      isNewShareOwner: true,
+                    },
+                  });
+                }).catch(error=>{
+                  alert("")
+                });
             });
+        })
+        .catch((error) => {
+          console.log("share owner not saved");
         });
-    }
-    else {
+    } else {
       alert("Lütfen Gerekli Bilgileri Doldurunuz");
     }
+  };
+
+  const onSubmit = async () => {
+    saveShareOwner();
   };
 
   // logic to control of check contact info input check
@@ -191,17 +192,7 @@ const Confirmation = () => {
     );
   }
 
-  const setShareInfo = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: string,
-    saveShareOwnerIndex: number
-  ) => {
-    console.log(saveShareOwnerList.length);
-
-    const name1 = { firstname: "x", lastName: "y", age: 27 };
-    let name2 = { ...name1 };
-    name2 = { ...name1, lastName: name1.lastName.toUpperCase() };
-
+  const setFields = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     switch (field) {
       case "fullName":
         setFullName(e.target.value);
@@ -216,6 +207,25 @@ const Confirmation = () => {
       default:
         break;
     }
+  };
+
+  const [shareOwnerMapper, setShareOwnerMapper] = useState<
+    Map<string, ShareOwner>
+  >(new Map());
+  const setShareInfo = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: string,
+    saveShareOwnerIndex: number
+  ) => {
+    // let sO = shareOwnerMapper.get(saveShareOwnerIndex.toString());
+    // console.log("ads")
+    // console.log(sO)
+    // if (sO != undefined) {
+    //   console.log("ads")
+    // }else {
+    //   setShareOwnerMapper(saveShareOwnerIndex.toString(),"")
+    // }
+    setFields(e, field);
   };
 
   // set share html tabs body
@@ -358,7 +368,7 @@ const Confirmation = () => {
                     className="teslimat-yazi"
                     style={{ width: "20%", marginLeft: "30px" }}
                   >
-                    Hİsse Adedi
+                    Hisse Adedi
                   </p>
                   <p
                     className="teslimat-yazi kesimhane-teslim"
@@ -412,7 +422,7 @@ const Confirmation = () => {
           // style={{ marginBottom: "182px" }}
           style={{ marginBottom: "60px" }}
           id="nextButton"
-          onClick={onVerifyCode}
+          onClick={onSubmit}
         >
           Kaydımı Kesinleştir!
         </button>
@@ -433,7 +443,7 @@ const Confirmation = () => {
               <Button
                 buttonTitle="Kodu Doğrula"
                 additionalStyles={["btn-success"]}
-                onClick={onVerifyCode}
+                onClick={onSubmit}
               ></Button>
             </div>
           </div>

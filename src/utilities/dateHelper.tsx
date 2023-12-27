@@ -7,9 +7,9 @@ export class DateHelper {
 
     let hour = newDate.getHours();
     let minute = newDate.getMinutes();
-
-    return `${date}.${
-      month < 10 ? `0${month}` : `${month}`
-    }.${year} ${hour}:${minute}`;
+    
+    return `${date}.${month < 10 ? `0${month}` : `${month}`}.${year} ${hour}:${
+      minute < 10 ? `0${minute}` : `${minute}`
+    }`;
   };
 }
