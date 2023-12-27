@@ -9,6 +9,8 @@ import { ShareOwner } from "../models/shareOwner";
 import { ShareOwnerService } from "../services/shareOwnerService";
 import { SacrificialAnimalService } from "../services/sacrificialAnimalService";
 import { SacrificialAnimal } from "../models/sacrificialAnimal";
+import { CuttingTime } from "../models/cuttingTime";
+import { CuttingTimeService } from "../services/cuttingTimeService";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -27,7 +29,8 @@ const Home = () => {
 
   const [selectedSacrificialAnimal, setSelectedSacrificialAnimal] =
     useState<SacrificialAnimal>();
-  const cuttingTimeList: string[] = ["9:00", "9:15", "9:30", "9:45"];
+  
+  const [availableCuttingTimes, setAvailableCuttingTimes] = useState<CuttingTime[]>([]);
   const [selectedCuttingTime, setSelectedCuttingTime] = useState<string>("");
 
   const [selectedShareOwnerWithTableItem, setSelectedShareOwnerWithTableItem] =
@@ -39,6 +42,17 @@ const Home = () => {
 
     setSelectedShareOwnerWithTableItem(shareOwner);
     document.getElementById(id)?.setAttribute("checked", "true");
+
+    if (shareOwner.animalID) {
+      _sacrificialAnimalService
+        .getById(parseInt(shareOwner.animalID))
+        .then((result) => {
+          if (result.purchasableShareQuantity) {
+            setShareQuantityForLoop(parseInt(result.purchasableShareQuantity));
+            setShareQuantityButtons();
+          }
+        });
+    }
   };
 
   const resetData = () => {
@@ -51,6 +65,7 @@ const Home = () => {
 
   const _shareOwnerService = new ShareOwnerService();
   const _sacrificialAnimalService = new SacrificialAnimalService();
+  const _cuttingTimeService = new CuttingTimeService();
 
   const onClickDeliveryType = (deliveryType: string) => {
     setDeliveryType(deliveryType);
@@ -77,6 +92,9 @@ const Home = () => {
       shareOwnerTabBody.style.display = "none";
     }
   };
+
+  const [shareQuantityForLoop, setShareQuantityForLoop] = useState<number>(0);
+
   useEffect(() => {
     console.log(deliveryType + " , " + shareCost + " , " + shareQuantity);
 
@@ -96,22 +114,31 @@ const Home = () => {
         setSacrificialAnimalList(result);
       }
     });
+
+    _cuttingTimeService.getAllBySelected(false).then((result) => {
+      if (result.length > 0) {
+        setAvailableCuttingTimes(result);
+      }
+    })
   }, [deliveryType, shareCost, shareQuantity]);
 
   // set share quantity html buttons
-  const shareQuantityButtons = [];
-  for (let index = 1; index <= 7; index++) {
-    shareQuantityButtons.push(
-      <li key={index}>
-        <a
-          className="dropdown-item"
-          onClick={() => onClickShareQuantity(index.toString())}
-        >
-          {index}
-        </a>
-      </li>
-    );
-  }
+  const shareQuantityButtons = [<a style={{display:"none"}}></a>];
+  const setShareQuantityButtons = () => {
+    for (let index = 1; index <= shareQuantityForLoop; index++) {
+      shareQuantityButtons.push(
+        <li key={index}>
+          <a
+            className="dropdown-item"
+            onClick={() => onClickShareQuantity(index.toString())}
+          >
+            {index}
+          </a>
+        </li>
+      );
+    }
+  };
+  setShareQuantityButtons();
 
   // set share cost html buttons
   const shareCostButtons = [];
@@ -166,9 +193,14 @@ const Home = () => {
       <li key={index}>
         <a
           className="dropdown-item"
-          onClick={() => setSelectedSacrificialAnimal(item)}
+          onClick={() => {
+            setSelectedSacrificialAnimal(item);
+            if (item.purchasableShareQuantity) {
+              setShareQuantityForLoop(parseInt(item.purchasableShareQuantity));
+            }
+          }}
         >
-          Dana {item.id}
+          Kurbanlık {item.id}
         </a>
       </li>
     ));
@@ -176,13 +208,13 @@ const Home = () => {
 
   // / set sacrificial animal cutting times html select box
   const setCuttingTimeHTMLItems = () => {
-    return cuttingTimeList.map((item, index) => (
+    return availableCuttingTimes.map((item, index) => (
       <li key={index}>
         <a
           className="dropdown-item"
-          onClick={() => setSelectedCuttingTime(item)}
+          onClick={() => setSelectedCuttingTime(item.time ? item.time : "")}
         >
-          {item}
+          {item.time}
         </a>
       </li>
     ));
@@ -445,7 +477,10 @@ const Home = () => {
                   role="tab"
                   aria-controls="home-tab-pane"
                   aria-selected="true"
-                  onClick={() => {resetData(); displayNone();}}
+                  onClick={() => {
+                    resetData();
+                    displayNone();
+                  }}
                 >
                   Hayvan Seç
                 </button>
@@ -466,7 +501,7 @@ const Home = () => {
                   }}
                   style={{ display: "none" }}
                 >
-                  Hisselerden Seç
+                  Ortak Hisse Seç
                 </button>
               </li>
             </ul>
@@ -678,7 +713,7 @@ const Home = () => {
                       style={{
                         display: "flex",
                         flexDirection: "column",
-                        padding: "0px"
+                        padding: "0px",
                       }}
                     >
                       {/* <div style={{ display: "flex" }}>{shareCostButtons}</div> */}

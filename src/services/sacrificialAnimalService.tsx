@@ -1,6 +1,6 @@
 import { FirebaseService } from "./firebaseService";
 import { SacrificialAnimal } from "../models/sacrificialAnimal";
-import { getDocs, query, where, addDoc } from "firebase/firestore";
+import { getDocs, query, where, addDoc, getDoc } from "firebase/firestore";
 
 export class SacrificialAnimalService {
   private static _firebaseService = new FirebaseService();
@@ -26,5 +26,16 @@ export class SacrificialAnimalService {
       }
     });
     return sacrificialAnimalList;
+  }
+
+  async getById(id: number) {
+    const querySnapshot = await getDocs(
+      query(SacrificialAnimalService._sacrificialAnimalCollectionRef, where("id", "==", id))
+    );
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].data() as SacrificialAnimal;
+    } else {
+      throw new Error("Something bad happened");
+    }
   }
 }

@@ -69,4 +69,8 @@ export class ShareOwner {
   public get processDate() {
     return this._processDate;
   }
+
+  public get animalID() {
+    return this._animalID;
+  }
 }
