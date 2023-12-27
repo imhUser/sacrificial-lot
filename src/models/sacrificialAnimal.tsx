@@ -1,11 +1,11 @@
 export class SacrificialAnimal {
-    private _id?: string;
+    private _id: number;
     private _purchasableShareQuantity?: string;
     private _totalPrice?: string;
     private _totalShareQuantity?: string;
   
     constructor(
-      id?: string,
+      id: number,
       purchasableShareQuantity?: string,
       totalPrice?: string,
       totalShareQuantity?: string

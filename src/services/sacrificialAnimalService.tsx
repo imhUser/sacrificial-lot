@@ -25,7 +25,7 @@ export class SacrificialAnimalService {
         console.error("sacrificial animal docs is empty");
       }
     });
-    return sacrificialAnimalList;
+    return sacrificialAnimalList.sort((a,b)=>{return a.id - b.id});
   }
 
   async getById(id: number) {
