@@ -7,7 +7,7 @@ export class ShareOwner {
   private _shareQuantity?: number;
   private _cuttingTime?: string;
   private _code?: string;
-  private _animalID?: string;
+  private _animalID?: number;
   private _processDate?: string;
 
   constructor(
@@ -19,7 +19,7 @@ export class ShareOwner {
     shareQuantity?: number,
     cuttingTime?: string,
     code?: string,
-    animalID?: string,
+    animalID?: number,
     processDate?: string
   ) {
     this._fullName = fullName;

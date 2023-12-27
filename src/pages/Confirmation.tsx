@@ -69,13 +69,13 @@ const Confirmation = () => {
   const [code, setCode] = useState("");
   const [confirmation, setConfirmation] = useState<ConfirmationResult>();
   const [isOpenSMSCodeSection, setIsOpenSMSCodeSection] = useState(false);
-  const onSendSMSCode = async () => {
-    await _firebaseService.sendSMSToPhone(
-      phone,
-      setIsOpenSMSCodeSection,
-      setConfirmation
-    );
-  };
+  // const onSendSMSCode = async () => {
+  //   await _firebaseService.sendSMSToPhone(
+  //     phone,
+  //     setIsOpenSMSCodeSection,
+  //     setConfirmation
+  //   );
+  // };
 
   const onVerifyCode = async () => {
     const newShareOwner = {
@@ -85,14 +85,14 @@ const Confirmation = () => {
       shareCost: shareCost,
       shareQuantity: shareQuantity,
       deliveryType: deliveryType,
-      code: code,
-      cuttingTime: "9:45",
-      animalID: "1",
+      code: Date.now().toString().substring(11,13) + phone.replaceAll(" ","").substring(8,10),
+      cuttingTime: selectedCuttingTime,
+      animalID: selectedSacrificialAnimal.id,
       processDate: processDate,
     } as ShareOwner;
 
     await _shareOwnerService
-      .verifyCode(confirmation, code, newShareOwner)
+      .addShareOwner(newShareOwner)
       .then((result) => {
         console.log("share owner saved, navigating...");
         navigate("/shareInfo", {
@@ -244,7 +244,7 @@ const Confirmation = () => {
                   className="form-control inputlar"
                   id="tel"
                   maxLength={13}
-                  placeholder="555 555 55 55"
+                  placeholder="(506) 555 55 55"
                   onChange={(e) => setShareInfo(e, "phone", index-1)}
                 />
               </div>
@@ -259,7 +259,7 @@ const Confirmation = () => {
                 type="text"
                 className="form-control inputlar"
                 id="address"
-                placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, eros vel bibendum lacinia, justo nunc tempor sapien, at viverra sapien ex ut nisi."
+                placeholder="Adres Giriniz"
                 onChange={(e) => setShareInfo(e, "address", index-1)}
               />
             </div>
@@ -277,7 +277,7 @@ const Confirmation = () => {
                 Tüm hisselerin bu iletişim bilgisine kaydedilmesini istiyorum.
               </label>
             </div>
-            <div className="form-check" style={{ marginTop: "10px" }}>
+            {/* <div className="form-check" style={{ marginTop: "10px" }}>
               <input
                 className="form-check-input"
                 type="checkbox"
@@ -286,7 +286,7 @@ const Confirmation = () => {
               <label className="form-check-label small" htmlFor="kayitCheckbox">
                 Vekaletimi verdim.
               </label>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -394,7 +394,7 @@ const Confirmation = () => {
           // style={{ marginBottom: "182px" }}
           style={{ marginBottom: "60px" }}
           id="nextButton"
-          onClick={onSendSMSCode}
+          onClick={onVerifyCode}
         >
           Kaydımı Kesinleştir!
         </button>

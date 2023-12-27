@@ -45,7 +45,7 @@ const Home = () => {
 
     if (shareOwner.animalID) {
       _sacrificialAnimalService
-        .getById(parseInt(shareOwner.animalID))
+        .getById(shareOwner.animalID)
         .then((result) => {
           if (result.purchasableShareQuantity) {
             setShareQuantityForLoop(parseInt(result.purchasableShareQuantity));
