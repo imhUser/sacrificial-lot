@@ -89,6 +89,8 @@ const Confirmation = () => {
       cuttingTime: selectedCuttingTime,
       animalID: selectedSacrificialAnimal.id,
       processDate: processDate,
+      deposit: false,
+      fee: false
     } as ShareOwner;
 
     await _shareOwnerService
@@ -186,7 +188,7 @@ const Confirmation = () => {
     
     switch (field) {
       case "fullName":
-        console.log("dsa")
+        setFullName(e.target.value);
         break;
       case "phone":
         setPhone(e.target.value);

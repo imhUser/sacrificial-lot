@@ -29,8 +29,7 @@ const ShareInfo = () => {
                 <thead className="thead-dark">
                   <tr>
                     <th>Hisse Sahibi</th>
-                    <th>Sıra No</th>
-                    <th>Hisse No</th>
+                    <th>Kod</th>
                     <th>Kesim Saati</th>
                     <th>Hisse Bedeli</th>
                     <th>Cep Telefonu</th>
@@ -43,15 +42,14 @@ const ShareInfo = () => {
                 <tbody>
                   <tr>
                     <td>{shareOwnerInfo.fullName}</td>
-                    <td>123</td>
-                    <td>456</td>
+                    <td>{shareOwnerInfo.code}</td>
                     <td>{shareOwnerInfo.cuttingTime}</td>
                     <td>{shareOwnerInfo.shareCost} TL</td>
                     <td>{shareOwnerInfo.phone}</td>
                     <td>{shareOwnerInfo.processDate}</td>
                     <td>{shareOwnerInfo.deliveryType}</td>
                     <td>
-                      <span
+                      {shareOwnerInfo.deposit ? <span
                         style={{
                           backgroundColor: "#bcf3e1",
                           color: "#1a9f75",
@@ -60,10 +58,7 @@ const ShareInfo = () => {
                         }}
                       >
                         Alındı
-                      </span>
-                    </td>
-                    <td>
-                      <span
+                      </span>:<span
                         style={{
                           backgroundColor: "#ffdadb",
                           color: "#e26260",
@@ -72,7 +67,28 @@ const ShareInfo = () => {
                         }}
                       >
                         Alınmadı
-                      </span>
+                      </span>}
+                    </td>
+                    <td>
+                    {shareOwnerInfo.fee ? <span
+                        style={{
+                          backgroundColor: "#bcf3e1",
+                          color: "#1a9f75",
+                          padding: "2vh",
+                          borderRadius: "5px",
+                        }}
+                      >
+                        Alındı
+                      </span>:<span
+                        style={{
+                          backgroundColor: "#ffdadb",
+                          color: "#e26260",
+                          padding: "2vh",
+                          borderRadius: "5px",
+                        }}
+                      >
+                        Alınmadı
+                      </span>}
                     </td>
                   </tr>
                 </tbody>
@@ -145,7 +161,7 @@ const ShareInfo = () => {
               className="text-white mx-auto d-block"
               style={{ width: "100%", marginBottom: "174px" }}
             >
-              <img src={CowImage} alt="" />
+              <img src={CowImage} alt=""  className="cowImage"/>
             </div>
           </div>
         </div>

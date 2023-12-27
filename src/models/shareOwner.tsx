@@ -9,6 +9,8 @@ export class ShareOwner {
   private _code?: string;
   private _animalID?: number;
   private _processDate?: string;
+  private _deposit?: boolean;
+  private _fee?: boolean;
 
   constructor(
     fullName?: string,
@@ -20,7 +22,9 @@ export class ShareOwner {
     cuttingTime?: string,
     code?: string,
     animalID?: number,
-    processDate?: string
+    processDate?: string,
+    deposit?: boolean,
+    fee?: boolean
   ) {
     this._fullName = fullName;
     this._phone = phone;
@@ -32,6 +36,16 @@ export class ShareOwner {
     this._code = code;
     this._animalID= animalID;
     this._processDate = processDate;
+    this._deposit = deposit;
+    this._fee = fee;
+  }
+
+  public get deposit() {
+    return this._deposit;
+  }
+
+  public get fee() {
+    return this._fee;
   }
 
   public get fullName() {

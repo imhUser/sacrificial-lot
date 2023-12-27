@@ -19,7 +19,7 @@ const Home = () => {
   const [shareCost, setShareCost] = useState<string>();
   const [shareQuantity, setShareQuantity] = useState<number>();
 
-  const [phone, setPhone] = useState<string>("");
+  const [code, setCode] = useState<string>("");
 
   const [loading, setLoading] = useState(true);
   const [shareOwnerList, setShareOwnerList] = useState<ShareOwner[]>([]);
@@ -222,7 +222,7 @@ const Home = () => {
 
   const onFindShareOwner = () => {
     _shareOwnerService
-      .getShareOwnerByPhone(phone)
+      .getShareOwnerByPhone(code)
       .then((shareOwnerInfo) => {
         navigate("/shareInfo", {
           state: {
@@ -317,10 +317,10 @@ const Home = () => {
                   fontWeight: "400",
                   lineHeight: "24px",
                 }}
-                placeholder="Telefon Numaranız"
+                placeholder="Kod Giriniz"
                 aria-label="Recipient's username"
                 aria-describedby="button-addon2"
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setCode(e.target.value)}
               />
               <button
                 className="btn btn-outline-secondary"
