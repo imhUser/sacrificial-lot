@@ -26,6 +26,6 @@ export class CuttingTimeService {
       }
     });
 
-    return times;
+    return times.sort((a,b)=>{return a.id - b.id});
   }
 }
