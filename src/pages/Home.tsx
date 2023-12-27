@@ -96,7 +96,6 @@ const Home = () => {
   const [shareQuantityForLoop, setShareQuantityForLoop] = useState<number>(0);
 
   useEffect(() => {
-    console.log("sad");
     _shareOwnerService.getAllShareOwners().then((result) => {
       if (result.length > 0) {
         let shareOwnerTabHeader = document.getElementById("profile-tab");
