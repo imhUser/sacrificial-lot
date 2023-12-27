@@ -34,6 +34,17 @@ export class ShareOwnerService {
     }
   }
 
+  async getShareOwnerByCode(code: string) {
+    const querySnapshot = await getDocs(
+      query(ShareOwnerService._shareOwnerCollectionRef, where("code", "==", code))
+    );
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].data() as ShareOwner;
+    } else {
+      throw new Error("Something bad happened");
+    }
+  }
+
   async addShareOwner(shareOwner: ShareOwner) {
     return await addDoc(ShareOwnerService._shareOwnerCollectionRef, shareOwner);
   }

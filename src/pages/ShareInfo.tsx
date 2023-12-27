@@ -25,13 +25,14 @@ const ShareInfo = () => {
           )}
           <div>
             <div className="container-fluid">
-              <table className="table table-borderless">
+              <table className="table table-borderless" id="customDataTable">
                 <thead className="thead-dark">
                   <tr>
                     <th>Hisse Sahibi</th>
                     <th>Kod</th>
                     <th>Kesim Saati</th>
                     <th>Hisse Bedeli</th>
+                    <th>Hisse Adedi</th>
                     <th>Cep Telefonu</th>
                     <th>İşlem Tarihi</th>
                     <th>Teslim Türü</th>
@@ -41,14 +42,15 @@ const ShareInfo = () => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>{shareOwnerInfo.fullName}</td>
-                    <td>{shareOwnerInfo.code}</td>
-                    <td>{shareOwnerInfo.cuttingTime}</td>
-                    <td>{shareOwnerInfo.shareCost} TL</td>
-                    <td>{shareOwnerInfo.phone}</td>
-                    <td>{shareOwnerInfo.processDate}</td>
-                    <td>{shareOwnerInfo.deliveryType}</td>
-                    <td>
+                    <td style={{textAlign:"left"}} data-th="Hisse Sahibi">{shareOwnerInfo.fullName}</td>
+                    <td style={{textAlign:"left"}} data-th="Kod">{shareOwnerInfo.code}</td>
+                    <td style={{textAlign:"left"}} data-th="Kesim Saati">{shareOwnerInfo.cuttingTime}</td>
+                    <td style={{textAlign:"left"}} data-th="Hisse Bedeli">{shareOwnerInfo.shareCost} TL</td>
+                    <td style={{textAlign:"left"}} data-th="Hisse Adedi">{shareOwnerInfo.shareQuantity} Adet</td>
+                    <td style={{textAlign:"left"}} data-th="Cep Telefonu">{shareOwnerInfo.phone}</td>
+                    <td style={{textAlign:"left"}} data-th="İşlem Tarihi">{shareOwnerInfo.processDate}</td>
+                    <td style={{textAlign:"left"}} data-th="Teslim Türü">{shareOwnerInfo.deliveryType}</td>
+                    <td style={{textAlign:"left"}} data-th="Kapora">
                       {shareOwnerInfo.deposit ? <span
                         style={{
                           backgroundColor: "#bcf3e1",
@@ -69,7 +71,7 @@ const ShareInfo = () => {
                         Alınmadı
                       </span>}
                     </td>
-                    <td>
+                    <td style={{textAlign:"left"}} data-th="Ücret">
                     {shareOwnerInfo.fee ? <span
                         style={{
                           backgroundColor: "#bcf3e1",

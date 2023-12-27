@@ -222,7 +222,7 @@ const Home = () => {
 
   const onFindShareOwner = () => {
     _shareOwnerService
-      .getShareOwnerByPhone(code)
+      .getShareOwnerByCode(code)
       .then((shareOwnerInfo) => {
         navigate("/shareInfo", {
           state: {

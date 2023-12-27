@@ -29,11 +29,40 @@ body {
     width: 80vw;
   }
 
-  .selectableInfos{
+  .selectableInfos {
     width: 100% !important;
   }
 
   .teslimat-yazi {
+    width: 100% !important;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  table#customDataTable caption {
+    background-image: none;
+  }
+
+  table#customDataTable thead {
+    display: none;
+  }
+
+  table#customDataTable tbody td {
+    display: block;
+    padding: 0.6rem;
+  }
+
+  table#customDataTable tbody td:before {
+    content: attr(data-th);
+    font-weight: bold;
+    display: inline-block;
+    width: 10rem;
+  }
+
+  table#customDataTable tr th:last-child,
+  table#customDataTable tr td:last-child {
+    max-width: 100% !important;
+    min-width: 100px !important;
     width: 100% !important;
   }
 }
