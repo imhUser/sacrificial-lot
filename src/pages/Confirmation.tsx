@@ -7,6 +7,7 @@ import { ShareOwner } from "../models/shareOwner";
 import { DateHelper } from "../utilities/dateHelper";
 import { SacrificialAnimal } from "../models/sacrificialAnimal";
 import { ShareOwnerService } from "../services/shareOwnerService";
+import { CuttingTimeService } from "../services/cuttingTimeService";
 
 interface Props {
   shareOwner?: ShareOwner;
@@ -23,6 +24,7 @@ const Confirmation = () => {
   const fromHome: Props = location.state.fromHome;
   const _firebaseService = new FirebaseService();
   const _shareOwnerService = new ShareOwnerService();
+  const _cuttingTimeService = new CuttingTimeService();
 
   const [fullName, setFullName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
@@ -38,11 +40,13 @@ const Confirmation = () => {
     {} as ShareOwner
   );
 
-  const [saveShareOwnerList, setSaveShareOwnerList] = useState<ShareOwner[]>([]);
+  const [saveShareOwnerList, setSaveShareOwnerList] = useState<ShareOwner[]>(
+    []
+  );
 
   const [selectedSacrificialAnimal, setSelectedSacrificialAnimal] =
     useState<SacrificialAnimal>({} as SacrificialAnimal);
-  const [selectedCuttingTime, setSelectedCuttingTime] = useState<string>();
+  const [selectedCuttingTime, setSelectedCuttingTime] = useState<string>("");
 
   useEffect(() => {
     if (Object.values(fromHome).every((p) => p !== null && p !== undefined)) {
@@ -57,14 +61,16 @@ const Confirmation = () => {
         fromHome.selectedCuttingTime != ""
       ) {
         setSelectedSacrificialAnimal(fromHome.selectedSacrificialAnimal);
-        setSelectedCuttingTime(fromHome.selectedCuttingTime);
+        if (fromHome.selectedCuttingTime) {
+          setSelectedCuttingTime(fromHome.selectedCuttingTime);
+        }
       }
 
       for (let index = 0; index < shareQuantity; index++) {
-        setSaveShareOwnerList(oldArray => [...oldArray, {} as ShareOwner]);
+        setSaveShareOwnerList((oldArray) => [...oldArray, {} as ShareOwner]);
       }
     }
-  },[]);
+  }, []);
 
   const [code, setCode] = useState("");
   const [confirmation, setConfirmation] = useState<ConfirmationResult>();
@@ -78,35 +84,46 @@ const Confirmation = () => {
   // };
 
   const onVerifyCode = async () => {
-    const newShareOwner = {
-      fullName: fullName,
-      phone: phone,
-      address: address,
-      shareCost: shareCost,
-      shareQuantity: shareQuantity,
-      deliveryType: deliveryType,
-      code: Date.now().toString().substring(11,13) + phone.replaceAll(" ","").substring(8,10),
-      cuttingTime: selectedCuttingTime,
-      animalID: selectedSacrificialAnimal.id,
-      processDate: processDate,
-      deposit: false,
-      fee: false
-    } as ShareOwner;
-
-    await _shareOwnerService
-      .addShareOwner(newShareOwner)
-      .then((result) => {
-        console.log("share owner saved, navigating...");
-        navigate("/shareInfo", {
-          state: {
-            shareOwner: newShareOwner,
-            isNewShareOwner: true,
-          },
+    if (fullName != "" && address != "" && phone != "") {
+      const newShareOwner = {
+        fullName: fullName,
+        phone: phone,
+        address: address,
+        shareCost: shareCost,
+        shareQuantity: shareQuantity,
+        deliveryType: deliveryType,
+        code:
+          Date.now().toString().substring(11, 13) +
+          phone.replaceAll(" ", "").substring(8, 10),
+        cuttingTime: selectedCuttingTime,
+        animalID: selectedSacrificialAnimal.id,
+        processDate: processDate,
+        deposit: false,
+        fee: false,
+      } as ShareOwner;
+      
+      await _cuttingTimeService
+        .setSelected(selectedCuttingTime)
+        .then((result) => {
+          _shareOwnerService
+            .addShareOwner(newShareOwner)
+            .then((result) => {
+              console.log("share owner saved, navigating...");
+              navigate("/shareInfo", {
+                state: {
+                  shareOwner: newShareOwner,
+                  isNewShareOwner: true,
+                },
+              });
+            })
+            .catch((error) => {
+              console.log("share owner not saved");
+            });
         });
-      })
-      .catch((error) => {
-        console.log("share owner not saved");
-      });
+    }
+    else {
+      alert("Lütfen Gerekli Bilgileri Doldurunuz");
+    }
   };
 
   // logic to control of check contact info input check
@@ -179,13 +196,12 @@ const Confirmation = () => {
     field: string,
     saveShareOwnerIndex: number
   ) => {
-    console.log(saveShareOwnerList.length)
+    console.log(saveShareOwnerList.length);
 
-    const name1 = {firstname: "x", lastName:"y", age: 27}
-    let name2 = {...name1}
-    name2 = {...name1, lastName: name1.lastName.toUpperCase()}
+    const name1 = { firstname: "x", lastName: "y", age: 27 };
+    let name2 = { ...name1 };
+    name2 = { ...name1, lastName: name1.lastName.toUpperCase() };
 
-    
     switch (field) {
       case "fullName":
         setFullName(e.target.value);
@@ -232,7 +248,7 @@ const Confirmation = () => {
                   className="form-control inputlar"
                   id="personName"
                   placeholder="Ad Soyad Giriniz"
-                  onChange={(e) => setShareInfo(e, "fullName", index-1)}
+                  onChange={(e) => setShareInfo(e, "fullName", index - 1)}
                 />
               </div>
             </div>
@@ -247,7 +263,7 @@ const Confirmation = () => {
                   id="tel"
                   maxLength={13}
                   placeholder="(506) 555 55 55"
-                  onChange={(e) => setShareInfo(e, "phone", index-1)}
+                  onChange={(e) => setShareInfo(e, "phone", index - 1)}
                 />
               </div>
             </div>
@@ -262,7 +278,7 @@ const Confirmation = () => {
                 className="form-control inputlar"
                 id="address"
                 placeholder="Adres Giriniz"
-                onChange={(e) => setShareInfo(e, "address", index-1)}
+                onChange={(e) => setShareInfo(e, "address", index - 1)}
               />
             </div>
             <div className="form-check" id={"check-info-input-" + index}>
